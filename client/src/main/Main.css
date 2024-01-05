@@ -1,0 +1,151 @@
+:root {
+    --navFont: 20px;
+    --baseBg: rgba(0, 0, 0, 0.7);
+}
+
+form {
+    margin: 0;
+    padding: 0;
+}
+
+.game-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+
+
+/*
+|
+|
+    =====> NAVBAR CONTAINER =====>
+|
+|
+*/
+
+.navbar-container {
+    padding: 0 2em;
+    display: flex;
+    flex-direction: row;
+    justify-content: stretch;
+    background-color: var(--baseBg);
+}
+
+.navbar-left {
+    display: flex;
+    flex: 1;
+    flex-direction: row;
+    align-items: center;
+    justify-content: left;
+}
+
+.navbar-right {
+    display: flex;
+    flex: 1;
+    flex-direction: row;
+    align-items: center;
+    justify-content: right;
+}
+
+.navbar-right > *, .navbar-left > * {
+    font-size: var(--navFont);
+    padding: 0.5em;
+}
+
+.navbar-right > form > button {
+    font-size: var(--navFont);
+    margin: 0;
+    padding: 10px;
+    width: 100%;
+    background-color: rgba(108, 108, 108, 0.7);
+    border: none;
+    border-radius: 15px;
+}
+
+.navbar-logo {
+    width: 30px;
+    padding: 1em;
+    transform: scale(350%);
+}
+
+
+/*
+|
+|
+    =====> MAIN CONTAINER =====>
+|
+|
+*/
+
+.main-container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: stretch;
+}
+
+.main-left, .main-right {
+    width: 50%;
+    /* border: 1px solid blue; */
+}
+
+.main-left {
+    background-color: var(--baseBg);
+}
+
+.main-right {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    background: rgb(0,0,0);
+    background: radial-gradient(circle, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.7) 67%, var(--baseBg) 100%);
+}
+
+/*
+|
+|
+    =====> MAIN CONTAINER =====> MAIN-LEFT =====>
+|
+|
+*/
+
+.drawer-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.drawer-element {
+    flex: 1;
+    padding: 1em;
+    background-color: grey;
+}
+
+
+/*
+|
+|
+    =====> MAIN CONTAINER =====> MAIN-RIGHT =====>
+|
+|
+*/
+
+.main-planet {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    font-size: 24px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    text-wrap: wrap;
+    min-width: 0px;
+}
+
+.planet-img {
+    width: 50%;
+    margin: 1em;
+}
