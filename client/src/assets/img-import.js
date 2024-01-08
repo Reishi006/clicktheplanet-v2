@@ -33,6 +33,8 @@ import coin from '../assets/ship/coin.svg';
 import lock from '../assets/env/lock.svg';
 import plus from '../assets/env/plus.svg';
 import hitGrad from '../assets/planets/hitGrad.svg';
+import skipArrowLeft from '../assets/env/skip-arrow-left.svg';
+import skipArrowRight from '../assets/env/skip-arrow-right.svg';
 
 export {
     logo, scaled_logo,
@@ -46,4 +48,5 @@ export {
     radiation, bullets, critHitGrad, coin,
     lock, plus,
     hitGrad,
+    skipArrowLeft, skipArrowRight,
 }

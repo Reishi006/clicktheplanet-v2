@@ -1,5 +1,6 @@
 :root {
     --navFont: 20px;
+    --panelsFont: 16px;
     --baseBg: rgba(0, 0, 0, 0.7);
     --baseGray: rgba(108, 108, 108, 0.7);
     --breatheColor: rgb(84, 212, 216);
@@ -25,6 +26,7 @@ form {
 .item-plus {
     width: 2em;
 }
+
 
 
 /*
@@ -59,7 +61,7 @@ form {
     justify-content: right;
 }
 
-.navbar-right > *, .navbar-left > * {
+.navbar-right > *, .navbar-left > *, .navbar-burger > * {
     font-size: var(--navFont);
     padding: 0.5em;
 }
@@ -78,6 +80,21 @@ form {
     width: 4em;
     padding: 1em;
     transform: scale(150%);
+}
+
+.navbar-burger {
+    display: none;
+    flex: 1;
+    flex-direction: row;
+    align-items: center;
+    justify-content: right;
+}
+
+.navbar-burger > div {
+    display: flex;
+    padding: calc(.5em + 10px);
+    justify-content: right;
+    align-items: center;
 }
 
 
@@ -107,11 +124,13 @@ form {
 
 .main-right {
     display: flex;
+    flex: 1;
     flex-direction: column;
-    justify-content: space-around;
+    justify-content: center;
     background: rgb(0,0,0);
     background: radial-gradient(circle, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.7) 67%, var(--baseBg) 100%);
 }
+
 
 /*
 |
@@ -130,7 +149,7 @@ form {
 .drawer-element {
     flex: 1;
     display: flex;
-    padding: 3%;
+    padding: 2%;
     justify-content: center;
 }
 
@@ -139,9 +158,9 @@ form {
 }
 
 .drawer-icon {
-    width: 60%;
+    width: 50%;
     max-width: 2em;
-    min-width: 20px;
+    min-width: 15px;
 }
 
 
@@ -199,7 +218,7 @@ form {
     align-items: center;
     background-color: var(--baseGray);
     border-radius: 15px;
-    font-size: 16px;
+    font-size: var(--panelsFont);
 }
 
 .store-item:hover {
@@ -242,7 +261,7 @@ form {
     background-color: rgba(90, 108, 165, 0.7);
     background-size: 200% 200%;
     border-radius: 15px;
-    font-size: 16px;
+    font-size: var(--panelsFont);
 }
 
 .ship-item:hover {
@@ -296,8 +315,9 @@ form {
     align-items: center;
     background-color: var(--baseGray);
     border-radius: 15px;
-    font-size: 18px;
+    font-size: var(--panelsFont);
 }
+
 
 
 /*
@@ -309,6 +329,7 @@ form {
 */
 
 .main-planet {
+    position: relative;
     display: flex;
     flex-direction: column;
     justify-content: space-around;
@@ -319,6 +340,14 @@ form {
     overflow: hidden;
     text-wrap: wrap;
     min-width: 0px;
+}
+
+.planet-state {
+    font-size: 18px;
+}
+
+.planet-level {
+    font-size: 30px;
 }
 
 .planet-img {
@@ -340,6 +369,53 @@ form {
     100% {transform: translateY(0);}
 }
 
+.advance-arrow-left, .advance-arrow-right {
+    position: absolute;
+    top: 45%;
+}
+
+.advance-arrow-left {
+    left: 10%;
+}
+
+.advance-arrow-right {
+    right: 10%;
+}
+
+.skip-arrow {
+    width: .8em;
+    height: .8em;
+    padding: 1em;
+}
+
+.planet-health-text {
+    font-size: var(--panelsFont);
+}
+
+.planet-health-container {
+    padding: .3em;
+    display: flex;
+    justify-content: center;
+}
+
+.planet-health-under {
+    width: 60%;
+    height: .8em;
+    background: linear-gradient(90deg, rgb(22, 24, 29) 0%, rgb(28, 35, 53) 100%);
+    border-radius: 15px;
+}
+
+.planet-health {
+    width: 10%;
+    height: inherit;
+    background: linear-gradient(90deg, #97ff9f 0%, rgb(0, 255, 13) 100%);
+    border-radius: inherit;
+}
+
+.spacer-div {
+    margin: 5%;
+}
+
 /* .planet-img:active {
     transform: scale(80%);
 } */
@@ -355,11 +431,70 @@ form {
 
 
 @media (max-width: 768px) {
+
+    :root {
+        --panelsFont: 12px;
+    }
+
+    .title {
+        margin: .5em .2em .2em .2em;
+        font-size: 16px;
+    }
+
     .main-container {
         flex-direction: column-reverse;
     }
 
     .main-left, .main-right {
         width: 100%;
+    }
+
+    .navbar-container {
+        padding: 0 0;
+    }
+
+    .navbar-right {
+        display: none;
+    }
+
+    .navbar-burger {
+        display: block;
+    }
+
+    .money-container {
+        font-size: var(--panelsFont);
+    }
+
+    .store-item-img {
+        width: 3em;
+        margin-right: 2.5em;
+    }
+
+    .ship-item-img {
+        width: 3em;
+        margin-right: 1em;
+    }
+
+    .planet-state {
+        font-size: var(--panelsFont);
+    }
+    
+    .planet-level {
+        font-size: 20px;
+    }
+
+    .planet-img {
+        width: 40%;
+    }
+
+    .advance-arrow-left, .advance-arrow-right {
+        top: 35%;
+    }
+
+    .advance-arrow-left {
+        left: 2%;
+    }
+    .advance-arrow-right {
+        right: 2%;
     }
 }
