@@ -10,8 +10,6 @@ const loginQuery = `SELECT * FROM users WHERE login = ?`;
 const checkUser = `SELECT * FROM users WHERE email = ? OR login = ?`;
 
 
-let refreshTokens = [];
-
 const checkAuth = (req, res, next) => {
     console.log('Cookie: ' + req.cookies);
     const token = req.cookies.access_token;
@@ -75,7 +73,7 @@ const loginHandler = async (req, res) => {
         if (isPasswordCorrect != true) return res.status(400).json("Wrong username or password!");
 
 
-        const token = jwt.sign({ id: data[0].id }, process.env.ACCESS_TOKEN_SECRET, {expiresIn: 60*60});
+        const token = jwt.sign({ id: data[0].id }, process.env.ACCESS_TOKEN_SECRET, {expiresIn: 8*60*60});
 
         res
         .cookie("access_token", token, {
