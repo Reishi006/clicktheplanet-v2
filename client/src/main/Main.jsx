@@ -24,6 +24,8 @@ import axios from 'axios';
 import io from 'socket.io-client';
 
 
+let count = 0;
+
 function Main() {
   const [errData, setErrData] = useState();
   const [socket, setSocket] = useState(null);
@@ -34,12 +36,18 @@ function Main() {
     randPlanet: '',
     randHue: '',
   });
+  const [playerState, setPlayerState] = useState({
+    gold: 100,
+    diamonds: 80,
+  });
   const [planetState, setPlanetState] = useState({
     currentHp: 99,
     maxHp: 100,
-    level: 8,
+    currentLevel: 8,
+    maxLevel: 8,
     stage: 0,
   });
+  const [message, setMessage] = useState('mess');
 
   
   const options = [<Store/>, <Ship/>, <Stats/>, <Guild/>, <Wheel/>];
@@ -76,17 +84,36 @@ function Main() {
     setRandColor({...randColor, randPlanet: getRandomColor(planet), randHue: hueRotate});
   }
   
-  const handlePlanet = () => {
+  const resetPlanet = () => {
     let checkRandom = planet;
     planet = Math.floor(Math.random() * 5);
     hueRotate = Math.floor(Math.random() * 359);
     if (planet === checkRandom) {planet = Math.abs(planet - 1);}
     setPlanet(planet);
     setRandColor({...randColor, randPlanet: getRandomColor(planet), randHue: hueRotate});
-    console.log(planetState.currentHp);
-    if (planetState.currentHp > 0) {setPlanetState(planetState => ({...planetState, currentHp: planetState.currentHp - 10}))}
-    if (planetState.currentHp <= 0) {setPlanetState(planetState => ({...planetState, currentHp: 0}))}
   }
+
+  const handlePlanet = () => {
+    
+    console.log(planetState.currentHp);
+    /*  
+    if (planetState.currentHp > 0) {setPlanetState(planetState => ({...planetState, currentHp: planetState.currentHp - data}))}
+    if (planetState.currentHp <= 0) {setPlanetState(planetState => ({...planetState, currentHp: 0}))} */
+    socket.emit('sendclick', 'User clicked');
+
+    socket.on('receiveclick', function(data) {
+      setPlanetState(planetState => ({...planetState, currentHp: data.gameState.planet.currentHp}));
+
+      if (data.resetPlanet === true) {
+        resetPlanet();
+      }
+    });
+  }
+
+  /* socket.on('receive_setall', (gameState) => {
+    console.log(`setall`);
+    setPlanetState(planetState => ({...planetState, currentHp: gameState.planet.currentHp}));
+  }); */
 
   const handleArrowLeft = () => {
       console.log('Arrow Left');
@@ -103,11 +130,24 @@ function Main() {
       const res = await axios.get('/routes/main');
 
       setUserLogin(res.data.login);
-
-      if (res.data.admin === 1) navigate('../mainadmin');
+      setPlayerState(playerState => ({...playerState,
+        gold: res.data.gold,
+        diamonds: res.data.diamonds,
+      }));
+      setPlanetState(planetState => ({...planetState, 
+        currentLevel: res.data.currentlevel, 
+        maxLevel: res.data.maxlevel,
+        stage: res.data.stage,
+      }));
 
       const newSocket = io(`http://localhost:8000`);
       setSocket(newSocket);
+
+      if (res.data.admin === 1) {
+        //newSocket.close();
+        return navigate('../mainadmin');
+      }
+
       return () => newSocket.close();
 
 
@@ -120,6 +160,7 @@ function Main() {
   useEffect(() => {
     onLogin();
     initiatePlanet();
+
   }, []);
 
   const handleLogout = async (e) => {
@@ -142,6 +183,7 @@ function Main() {
             <div><img src={scaled_logo} className='navbar-logo' alt='logo'></img></div>
           </div>
           <div className='navbar-right'>
+            <div>{message}</div>
             <div>{userLogin}</div>
             <div>Settings</div>
             <form method='post' onSubmit={handleLogout}><button type='submit' name='submit'>Logout</button></form>
@@ -161,8 +203,8 @@ function Main() {
 
               <div className='main-content-container'>
                 <div className='money-display'>
-                  <div className='money-container'><img src={gold} className='money-logo' alt='gold'></img> 145</div>
-                  <div className='money-container'><img src={diamond} className='money-logo' alt='diamond'></img> 100</div>
+                  <div className='money-container'><img src={gold} className='money-logo' alt='gold'></img> {playerState.gold}</div>
+                  <div className='money-container'><img src={diamond} className='money-logo' alt='diamond'></img> {playerState.diamonds}</div>
                 </div>
                 {options[show]}
               </div>

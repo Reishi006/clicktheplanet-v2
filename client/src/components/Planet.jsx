@@ -16,7 +16,7 @@ export default function Planet({
     return (
         <>
             <div className='planet-state'>
-                <div className='planet-level'>Level: {planetState.level}</div>
+                <div className='planet-level'>Level: {planetState.currentLevel}</div>
                 <div className='planet-stage'>{planetState.stage}/10</div>
                 <div className='planet-name'>WX-137</div>
             </div>

@@ -40,6 +40,7 @@ function Main() {
     level: 8,
     stage: 0,
   });
+  const [message, setMessage] = useState('mess');
 
   
   const options = [<Store/>, <Ship/>, <Stats/>, <Guild/>, <Wheel/>];
@@ -86,6 +87,14 @@ function Main() {
     console.log(planetState.currentHp);
     if (planetState.currentHp > 0) {setPlanetState(planetState => ({...planetState, currentHp: planetState.currentHp - 10}))}
     if (planetState.currentHp <= 0) {setPlanetState(planetState => ({...planetState, currentHp: 0}))}
+
+    socket.emit('sendclick', 'User clicked');
+
+    socket.on('receiveclick', function(msg) {
+      console.log('clicked');
+      setMessage(msg);
+    });
+    
   }
 
   const handleArrowLeft = () => {
@@ -140,6 +149,7 @@ function Main() {
           </div>
           <div className='navbar-right'>
             <div style={{fontSize: '12px'}}>Add gold, or whatever...</div>
+            <div>{message}</div>
             <div>ADMIN:</div>
             <div>{userLogin}</div>
             <div>Settings</div>
