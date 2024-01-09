@@ -4,33 +4,22 @@ const express = require('express');
 const sessionStorage = require('sessionstorage');
 const app = express();
 const http = require('http');
-const { Server } = require('socket.io')
+const { Server } = require('socket.io');
 const { authorize } = require('socketio-jwt');
 const jwt = ('jsonwebtoken');
 const cookie = require('cookie');
 const cookies = require("cookie-parser");
 const cookieParser = require('socket.io-cookie-parser');
+const uuid = require('uuid');
 const db = require('./db.js');
 const authRoutes = require('./routes/auth.js');
+const socketio = require('./game/gameState.js');
 
 //const { check } = require('express-validator');
 const cors = require('cors');
 
 const server = http.createServer(app);
-
-const io = new Server(server, {
-    cookie: {
-        name: 'access_token',
-        httpOnly: true,
-    },
-    cors: {
-        origin: 'http://localhost:3000',
-        methods: ['GET', 'POST'],
-        credentials: true,
-    }
-});
-
-io.use(cookieParser());
+const io = socketio.getIo(server);
 
 app.use(cors({
     origin: true, 
@@ -51,9 +40,7 @@ app.get('/', (req, res) => {
     res.send('Hello');
 });
 
-io.on('connection', (socket) => {
-    console.log(`socket: ${socket.id}`);
-})
+
 
 server.listen(process.env.PORT, () => {
     console.log(`Port that is listened on ${process.env.PORT}`);
