@@ -129,7 +129,7 @@ router.get('/mainadmin', checkAuth, checkAdmin, (req, res) => {
     db.query('SELECT * FROM users WHERE id = ?', req.id, (err, data) => {
         if (err) return res.status(500).json(err);
         console.log(data[0].login);
-        return res.json({login: data[0].login});
+        //return res.json({login: data[0].login});
     });
 })
 
