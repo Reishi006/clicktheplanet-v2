@@ -30,7 +30,7 @@ const io = new Server(server, {
     }
 });
 
-io.use(cookieParser())
+io.use(cookieParser());
 
 app.use(cors({
     origin: true, 
@@ -51,13 +51,9 @@ app.get('/', (req, res) => {
     res.send('Hello');
 });
 
-/* io.on('connection', (socket) => {
-    console.log('A user has connected ' + socket.id);
-});
-
-io.on('message', (socket) => {
-    console.log(socket.request.cookies['access_token']);
-}) */
+io.on('connection', (socket) => {
+    console.log(`socket: ${socket.id}`);
+})
 
 server.listen(process.env.PORT, () => {
     console.log(`Port that is listened on ${process.env.PORT}`);
