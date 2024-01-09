@@ -9,14 +9,14 @@ import {
   store, ship, stats, guild, wheel,
   skipArrowLeft, skipArrowRight,
 } from '../assets/img-import.js';
-import Store from '../components/Store';
-import Ship from '../components/Ship';
-import Stats from '../components/Stats';
-import Guild from '../components/Guild';
-import Wheel from '../components/Wheel';
-import Planet from '../components/Planet';
-import Drawer from '../components/Drawer';
-import extractStatus from '../auth/Register';
+import Store from '../components/Store.jsx';
+import Ship from '../components/Ship.jsx';
+import Stats from '../components/Stats.jsx';
+import Guild from '../components/Guild.jsx';
+import Wheel from '../components/Wheel.jsx';
+import Planet from '../components/Planet.jsx';
+import Drawer from '../components/Drawer.jsx';
+import extractStatus from '../auth/Register.jsx';
 //import { getRandomColor, handlePlanet, handleArrowLeft, handleArrowRight } from '../functions/GameFunctions';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -100,19 +100,16 @@ function Main() {
 
   const onLogin = async () => {
     try {
-      const res = await axios.get('/routes/main');
+      const res = await axios.get('/routes/mainadmin');
 
       setUserLogin(res.data.login);
-
-      if (res.data.admin === 1) navigate('../mainadmin');
 
       const newSocket = io(`http://localhost:8000`);
       setSocket(newSocket);
       return () => newSocket.close();
 
-
     } catch (error) {
-      console.log('/main error');
+      console.log('/main_admin error');
       navigate('../unauthorized');
     }
   }
@@ -142,6 +139,8 @@ function Main() {
             <div><img src={scaled_logo} className='navbar-logo' alt='logo'></img></div>
           </div>
           <div className='navbar-right'>
+            <div style={{fontSize: '12px'}}>Add gold, or whatever...</div>
+            <div>ADMIN:</div>
             <div>{userLogin}</div>
             <div>Settings</div>
             <form method='post' onSubmit={handleLogout}><button type='submit' name='submit'>Logout</button></form>
