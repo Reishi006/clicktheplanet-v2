@@ -1,4 +1,5 @@
 const express = require('express');
+const { Server } = require('socket.io')
 const db = require('../db.js');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -25,11 +26,24 @@ const checkAuth = (req, res, next) => {
         db.query('SELECT * FROM users WHERE login = ?', user.id, (err, data) => {
             if (err) return res.status(500).json(err);
             console.log('losowe from query' + user.id);
+            return (user.id);
         });
+        req.id = user.id;
         next();
     });
     
 }
+
+const checkAdmin = (req, res, next) => {
+    db.query('SELECT admin FROM users WHERE id = ?', req.id, (err, data) => {
+        //if (err) return res.status(500).json(err);
+        if (data[0].admin === 0) return res.sendStatus(403);
+        else if (data[0].admin === 1) console.log(`${req.id} is an Admin!`);
+        return data[0].admin;
+    });
+    next();
+}
+
 
 const registerHandler = async (req, res) => {
     const { email, login, password } =  await req.body;
@@ -100,9 +114,24 @@ router.post('/login', loginHandler);
 
 
 router.get('/main', checkAuth, (req, res) => {
-    res.send('Hello from main');
-    //res.json({ accessToken: accessToken, refreshToken: refreshToken });
+    console.log(`req.id: ${req.id}`);
+
+    db.query('SELECT * FROM users WHERE id = ?', req.id, (err, data) => {
+        if (err) return res.status(500).json(err);
+        console.log(data[0].login);
+        return res.json({login: data[0].login, admin: data[0].admin});
+    });
 });
+
+router.get('/mainadmin', checkAuth, checkAdmin, (req, res) => {
+    console.log(`mainadmin req.id: ${req.id}`);
+
+    db.query('SELECT * FROM users WHERE id = ?', req.id, (err, data) => {
+        if (err) return res.status(500).json(err);
+        console.log(data[0].login);
+        return res.json({login: data[0].login});
+    });
+})
 
 
 router.post('/logout', (req, res) => {
