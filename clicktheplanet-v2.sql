@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 09, 2024 at 08:29 AM
+-- Generation Time: Jan 09, 2024 at 10:19 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -36,6 +36,13 @@ CREATE TABLE `game` (
   `stage` int(2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `game`
+--
+
+INSERT INTO `game` (`id`, `gold`, `diamonds`, `currentlevel`, `maxlevel`, `stage`) VALUES
+(11, '2137', '120', '2', '3', 5);
+
 -- --------------------------------------------------------
 
 --
@@ -57,7 +64,7 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`id`, `email`, `login`, `password`, `admin`, `game_id`) VALUES
 (10, 'hello@mail.com', 'Hello', '$2a$10$0WrhDWNoA2IQL6J7aGOA2O3uYkz9Tc/eEjXjjumMtvhcGb.KIrBRW', 1, 0),
-(11, 'qwe@mail.com', 'Qwe', '$2a$10$lINez2/4OXVjAVtY5Ajr/uw/S5vaIPGq.JCPq6Hki0SkmIbXSblRC', 0, 0),
+(11, 'qwe@mail.com', 'Qwe', '$2a$10$lINez2/4OXVjAVtY5Ajr/uw/S5vaIPGq.JCPq6Hki0SkmIbXSblRC', 0, 11),
 (12, 'moststrongestpotato@mail.com', 'MostStrongestPotato', '$2a$10$MSNS3Qq8/744On2MeolpTOyu6fvCnxIS3A8BNVMBNpJ8.i/koUEW.', 0, 0);
 
 --
@@ -84,7 +91,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `game`
 --
 ALTER TABLE `game`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `users`
