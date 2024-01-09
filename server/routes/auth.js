@@ -4,12 +4,15 @@ const db = require('../db.js');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+const gameState = require('../game/gameStateObj.js');
+
 const router = express.Router();
 
 const registerQuery = `INSERT INTO users (email, login, password) VALUES (?)`;
 const loginQuery = `SELECT * FROM users WHERE login = ?`;
 const checkUser = `SELECT * FROM users WHERE email = ? OR login = ?`;
 
+global.userId = null;
 
 const checkAuth = (req, res, next) => {
     console.log('Cookie: ' + req.cookies);
@@ -34,15 +37,15 @@ const checkAuth = (req, res, next) => {
     
 }
 
-const checkAdmin = (req, res, next) => {
+/* const checkAdmin = (req, res, next) => {
     db.query('SELECT admin FROM users WHERE id = ?', req.id, (err, data) => {
-        //if (err) return res.status(500).json(err);
+        if (err) return res.status(500).json(err);
         if (data[0].admin === 0) return res.sendStatus(403);
         else if (data[0].admin === 1) console.log(`${req.id} is an Admin!`);
         return data[0].admin;
     });
     next();
-}
+} */
 
 
 const registerHandler = async (req, res) => {
@@ -116,20 +119,53 @@ router.post('/login', loginHandler);
 router.get('/main', checkAuth, (req, res) => {
     console.log(`req.id: ${req.id}`);
 
+    global.userId = req.id;
+    console.log(`global.userId ${typeof global.userId}`);
+    process.emit('currentUserIdSet', global.userId);
+
+    db.query('SELECT * FROM game JOIN users ON game.id = users.game_id WHERE users.id = ?', req.id, (err, data) => {
+        if (err) return res.status(500).json(err);
+        console.log(data[0].login);
+
+        gameState.player.gold = data[0].gold;
+        gameState.player.diamonds = data[0].diamonds;
+        
+        gameState.planet.currentLevel = data[0].currentlevel;
+        gameState.planet.maxLevel = data[0].maxlevel;
+        gameState.planet.stage = data[0].stage;
+
+        return res.json({
+            login: data[0].login, admin: data[0].admin,
+            gold: data[0].gold,
+            diamonds: data[0].diamonds,
+            currentlevel: data[0].currentlevel,
+            maxlevel: data[0].maxlevel,
+            stage: data[0].stage,
+        });
+    });
+
+    //SET GAME STATE
+    /* db.query('SELECT * FROM game JOIN users ON game.id = users.game_id WHERE users.id = ?', req.id, (err, data) => {
+        console.log(data[0].gold);
+        gameState.player.gold = data[0].gold;
+        console.log(`gameState.player.gold  ${gameState.player.gold }`);
+        res.json({gold: data[0].gold});
+    }); */
+});
+
+router.get('/mainadmin', checkAuth, /* checkAdmin, */ (req, res) => {
+    console.log(`mainadmin req.id: ${req.id}`);
+
+    /* db.query('SELECT * FROM users WHERE id = ?', req.id, (err, data) => {
+        if (err) return res.status(500).json(err);
+        //console.log(data[0].login);
+        return res.json({login: data[0].login});
+    }); */
+
     db.query('SELECT * FROM users WHERE id = ?', req.id, (err, data) => {
         if (err) return res.status(500).json(err);
         console.log(data[0].login);
         return res.json({login: data[0].login, admin: data[0].admin});
-    });
-});
-
-router.get('/mainadmin', checkAuth, checkAdmin, (req, res) => {
-    console.log(`mainadmin req.id: ${req.id}`);
-
-    db.query('SELECT * FROM users WHERE id = ?', req.id, (err, data) => {
-        if (err) return res.status(500).json(err);
-        console.log(data[0].login);
-        //return res.json({login: data[0].login});
     });
 })
 
