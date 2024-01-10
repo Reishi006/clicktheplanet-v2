@@ -127,11 +127,11 @@ router.get('/main', checkAuth, (req, res) => {
         if (err) return res.status(500).json(err);
         console.log(data[0].login);
 
-        gameState.player.gold = data[0].gold;
-        gameState.player.diamonds = data[0].diamonds;
+        gameState.player.gold = Number(data[0].gold);
+        gameState.player.diamonds = Number(data[0].diamonds);
         
-        gameState.planet.currentLevel = data[0].currentlevel;
-        gameState.planet.maxLevel = data[0].maxlevel;
+        gameState.planet.currentLevel = Number(data[0].currentlevel);
+        gameState.planet.maxLevel = Number(data[0].maxlevel);
         gameState.planet.stage = data[0].stage;
 
         return res.json({
