@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 09, 2024 at 10:19 PM
+-- Generation Time: Jan 10, 2024 at 07:14 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -41,7 +41,7 @@ CREATE TABLE `game` (
 --
 
 INSERT INTO `game` (`id`, `gold`, `diamonds`, `currentlevel`, `maxlevel`, `stage`) VALUES
-(11, '2137', '120', '2', '3', 5);
+(11, '2137', '120', '17', '17', 8);
 
 -- --------------------------------------------------------
 
