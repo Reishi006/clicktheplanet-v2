@@ -41,7 +41,7 @@ function Main() {
     diamonds: 80,
   });
   const [planetState, setPlanetState] = useState({
-    currentHp: 99,
+    currentHp: 100,
     maxHp: 100,
     currentLevel: 8,
     maxLevel: 8,
@@ -102,7 +102,11 @@ function Main() {
     socket.emit('sendclick', 'User clicked');
 
     socket.on('receiveclick', function(data) {
-      setPlanetState(planetState => ({...planetState, currentHp: data.gameState.planet.currentHp}));
+      setPlanetState(planetState => ({...planetState, 
+        currentHp: data.gameState.planet.currentHp,
+        currentLevel: data.gameState.planet.currentLevel,
+        stage: data.gameState.planet.stage,
+      }));
 
       if (data.resetPlanet === true) {
         resetPlanet();
