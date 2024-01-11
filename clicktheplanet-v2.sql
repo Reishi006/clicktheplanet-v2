@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 10, 2024 at 06:38 PM
+-- Generation Time: Jan 11, 2024 at 07:18 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -35,6 +35,7 @@ CREATE TABLE `game` (
   `maxlevel` varchar(50) NOT NULL,
   `currentstage` int(2) NOT NULL,
   `maxstage` int(2) NOT NULL,
+  `totaldamage` varchar(50) NOT NULL,
   `guild_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -42,10 +43,10 @@ CREATE TABLE `game` (
 -- Dumping data for table `game`
 --
 
-INSERT INTO `game` (`id`, `gold`, `diamonds`, `currentlevel`, `maxlevel`, `currentstage`, `maxstage`, `guild_id`) VALUES
-(10, '420', '999', '1', '1', 9, 0, 0),
-(11, '2137', '120', '23', '23', 0, 0, 0),
-(12, '100', '100', '18', '18', 3, 3, 0);
+INSERT INTO `game` (`id`, `gold`, `diamonds`, `currentlevel`, `maxlevel`, `currentstage`, `maxstage`, `totaldamage`, `guild_id`) VALUES
+(10, '420', '999', '1', '1', 9, 0, '', 0),
+(11, '2137', '120', '26', '26', 1, 1, '1337', 3),
+(12, '100', '100', '19', '19', 1, 1, '', 0);
 
 -- --------------------------------------------------------
 
@@ -57,15 +58,54 @@ CREATE TABLE `guilds` (
   `id` int(11) NOT NULL,
   `name` varchar(50) NOT NULL,
   `owner` int(11) NOT NULL,
-  `messages_id` int(11) NOT NULL
+  `guild_members_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `guilds`
 --
 
-INSERT INTO `guilds` (`id`, `name`, `owner`, `messages_id`) VALUES
-(3, 'Galaxy conquerors', 11, 1);
+INSERT INTO `guilds` (`id`, `name`, `owner`, `guild_members_id`) VALUES
+(3, 'Galaxy conquerors', 11, 3),
+(4, 'Clickers', 10, 4);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `guild_members`
+--
+
+CREATE TABLE `guild_members` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `guild_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `guild_members`
+--
+
+INSERT INTO `guild_members` (`id`, `user_id`, `guild_id`) VALUES
+(3, 11, 3);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `invitations`
+--
+
+CREATE TABLE `invitations` (
+  `id` int(11) NOT NULL,
+  `guild_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `invitations`
+--
+
+INSERT INTO `invitations` (`id`, `guild_id`, `user_id`) VALUES
+(1, 3, 12);
 
 -- --------------------------------------------------------
 
@@ -86,7 +126,11 @@ CREATE TABLE `messages` (
 --
 
 INSERT INTO `messages` (`id`, `user`, `message`, `date_sent`, `guild_id`) VALUES
-(1, 'Qwe', 'Hello world', '2024-01-10 17:37:25', 3);
+(1, 'Qwe', 'Hello world', '2024-01-10 17:37:25', 3),
+(2, 'Qwe', 'Lorem Ipsum Lorem Ipsum', '2024-01-10 18:20:44', 3),
+(3, 'Qwe', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc eu suscipit nisl. Nam hendrerit dapibus fermentum. Nunc bibendum vehicula felis ac euismod.', '2024-01-10 19:59:44', 3),
+(4, 'Qwe', 'Mauris nec tortor laoreet, posuere leo non, rutrum odio. Integer eget elit lacinia, tristique enim sed, tristique nunc. Quisque molestie sit amet mauris et mollis.', '2024-01-10 20:00:35', 3),
+(5, 'Qwe', 'Nam faucibus ex metus, at sagittis augue maximus non. Ut vitae erat vitae elit cursus consequat. In aliquam iaculis ligula, eget posuere ligula lacinia sed. Ut scelerisque in velit ac feugiat. Nunc sed risus rhoncus neque mollis congue eu at nunc. Donec quis consequat purus, ac facilisis purus.', '2024-01-10 20:01:11', 3);
 
 -- --------------------------------------------------------
 
@@ -126,8 +170,19 @@ ALTER TABLE `game`
 -- Indexes for table `guilds`
 --
 ALTER TABLE `guilds`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `messages_id` (`messages_id`);
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `guild_members`
+--
+ALTER TABLE `guild_members`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `invitations`
+--
+ALTER TABLE `invitations`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `messages`
@@ -156,13 +211,25 @@ ALTER TABLE `game`
 -- AUTO_INCREMENT for table `guilds`
 --
 ALTER TABLE `guilds`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `guild_members`
+--
+ALTER TABLE `guild_members`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `invitations`
+--
+ALTER TABLE `invitations`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `messages`
 --
 ALTER TABLE `messages`
-  MODIFY `id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `users`
