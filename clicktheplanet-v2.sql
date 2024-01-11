@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 11, 2024 at 07:18 AM
+-- Generation Time: Jan 11, 2024 at 10:57 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -45,8 +45,8 @@ CREATE TABLE `game` (
 
 INSERT INTO `game` (`id`, `gold`, `diamonds`, `currentlevel`, `maxlevel`, `currentstage`, `maxstage`, `totaldamage`, `guild_id`) VALUES
 (10, '420', '999', '1', '1', 9, 0, '', 0),
-(11, '2137', '120', '26', '26', 1, 1, '1337', 3),
-(12, '100', '100', '19', '19', 1, 1, '', 0);
+(11, '2137', '120', '29', '29', 0, 0, '1337', 3),
+(12, '100', '100', '19', '19', 8, 8, '', 3);
 
 -- --------------------------------------------------------
 
@@ -126,11 +126,14 @@ CREATE TABLE `messages` (
 --
 
 INSERT INTO `messages` (`id`, `user`, `message`, `date_sent`, `guild_id`) VALUES
-(1, 'Qwe', 'Hello world', '2024-01-10 17:37:25', 3),
-(2, 'Qwe', 'Lorem Ipsum Lorem Ipsum', '2024-01-10 18:20:44', 3),
-(3, 'Qwe', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc eu suscipit nisl. Nam hendrerit dapibus fermentum. Nunc bibendum vehicula felis ac euismod.', '2024-01-10 19:59:44', 3),
-(4, 'Qwe', 'Mauris nec tortor laoreet, posuere leo non, rutrum odio. Integer eget elit lacinia, tristique enim sed, tristique nunc. Quisque molestie sit amet mauris et mollis.', '2024-01-10 20:00:35', 3),
-(5, 'Qwe', 'Nam faucibus ex metus, at sagittis augue maximus non. Ut vitae erat vitae elit cursus consequat. In aliquam iaculis ligula, eget posuere ligula lacinia sed. Ut scelerisque in velit ac feugiat. Nunc sed risus rhoncus neque mollis congue eu at nunc. Donec quis consequat purus, ac facilisis purus.', '2024-01-10 20:01:11', 3);
+(1, '11', 'Hello world', '2024-01-11 08:23:45', 3),
+(2, '11', 'Lorem Ipsum Lorem Ipsum', '2024-01-11 08:23:49', 3),
+(3, '11', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc eu suscipit nisl. Nam hendrerit dapibus fermentum. Nunc bibendum vehicula felis ac euismod.', '2024-01-11 08:23:53', 3),
+(4, '11', 'Mauris nec tortor laoreet, posuere leo non, rutrum odio. Integer eget elit lacinia, tristique enim sed, tristique nunc. Quisque molestie sit amet mauris et mollis.', '2024-01-11 08:23:57', 3),
+(5, '11', 'Nam faucibus ex metus, at sagittis augue maximus non. Ut vitae erat vitae elit cursus consequat. In aliquam iaculis ligula, eget posuere ligula lacinia sed. Ut scelerisque in velit ac feugiat. Nunc sed risus rhoncus neque mollis congue eu at nunc. Donec quis consequat purus, ac facilisis purus.', '2024-01-11 08:24:02', 3),
+(6, '10', 'Hello I\'m from a different guild!', '2024-01-11 08:24:06', 4),
+(7, '11', 'I\'m from this guild! Galaxy conquerors', '2024-01-11 08:24:10', 3),
+(8, '12', 'I\'m Most Strongest Potato hello!', '2024-01-11 08:46:50', 3);
 
 -- --------------------------------------------------------
 
@@ -229,7 +232,7 @@ ALTER TABLE `invitations`
 -- AUTO_INCREMENT for table `messages`
 --
 ALTER TABLE `messages`
-  MODIFY `id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `users`
