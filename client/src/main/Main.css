@@ -82,6 +82,82 @@ form {
     transform: scale(150%);
 }
 
+.navbar-profile-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    /* background-color: rgba(108, 108, 108, 1.0);
+    border-radius: 15px; */
+}
+
+.navbar-profile-container > div {
+    margin: .2em .5em;
+}
+
+.navbar-profile-logo {
+    margin: 0 auto;
+    width: 2em;
+}
+
+.navbar-profile-nickname {
+    justify-content: center;
+    align-items: center;
+}
+
+.navbar-settings {
+    width: 33%;
+    min-width: 300px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(108, 108, 108, 1.0);
+    border-radius: 15px;
+    z-index: 2;
+}
+
+.navbar-settings > div {
+    text-align: left;
+}
+
+.navbar-settings-relative {
+    position: relative;
+    display: flex;
+    justify-content: right;
+    align-items: center;
+}
+
+.navbar-settings-title {
+    font-size: 18px;
+    width: 100%;
+}
+
+.navbar-settings-close {
+    padding: .3em;
+    width: 1em;
+    position: absolute;
+    background-color: rgba(223, 0, 0, 0.7);
+    border-radius: 100%;
+}
+
+.navbar-settings-close:hover {
+    background-color: rgba(255, 0, 0, 0.7);
+}
+
+
+.navbar-settings > div {
+    padding: 1em;
+}
+
+.navbar-settings-toggle {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: 1;
+}
+
 .navbar-burger {
     display: none;
     flex: 1;
@@ -330,6 +406,82 @@ form {
 }
 
 
+/* ===== GUILD ===== */
+
+.guild-container {
+    min-height: 40vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.guild-chat {
+    min-height: 300px;
+    max-height: 500px;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+}
+
+.guild-message {
+    margin-top: 2px;
+    padding: .5em;
+    display: flex;
+    flex-direction: column;
+    justify-content: left;
+    background-color: rgba(63, 63, 63, 0.7);
+}
+
+.guild-message:first-child {
+    margin-top: 0;
+}
+
+.guild-message-sent {
+    display: flex;
+    flex-direction: row;
+}
+
+.guild-user {
+    margin: .2em 1em .2em .2em;
+    font-size: var(--panelsFont);
+}
+
+.guild-sent {
+    margin: .2em;
+    text-align: left;
+    font-size: 14px;
+    color: rgb(231, 231, 231);
+}
+
+.sent-date {
+    margin: .5em;
+    text-align: right;
+    font-size: 11px;
+    color: rgb(180, 180, 180);
+}
+
+.guild-input-container {
+    margin-top: 2px;
+    display: flex;
+    flex-direction: column;
+}
+
+.guild-input-container > form {
+    display: flex;
+    flex-direction: row;
+}
+
+.guild-chat-input {
+    flex: 1;
+    width: auto;
+    margin: 0 2px 0 0;
+    background-color: rgba(63, 63, 63, 0.7);
+}
+
+.guild-chat-btn {
+    padding: 1em;
+    background-color: rgba(63, 63, 63, 0.7);
+    border: none;
+}
 
 /*
 |

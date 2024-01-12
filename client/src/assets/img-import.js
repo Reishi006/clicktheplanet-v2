@@ -2,6 +2,13 @@ import logo from '../assets/env/small_Logo_CtP.png';
 import scaled_logo from '../assets/env/small_scaled_Logo_CtP.png';
 import gold from '../assets/env/smaller_gold.png';
 import diamond from '../assets/env/smaller_diamond.png';
+import settings from '../assets/env/settings.svg';
+import x from '../assets/env/x.svg';
+import user_prof1 from '../assets/profile/user_prof1.svg';
+import user_prof2 from '../assets/profile/user_prof2.svg';
+import user_prof3 from '../assets/profile/user_prof3.svg';
+import user_prof4 from '../assets/profile/user_prof4.svg';
+import user_prof5 from '../assets/profile/user_prof5.svg';
 import planet1 from '../assets/planets/planet-1.png';
 import planet2 from '../assets/planets/planet-2.png';
 import planet3 from '../assets/planets/planet-3.png';
@@ -39,6 +46,8 @@ import skipArrowRight from '../assets/env/skip-arrow-right.svg';
 export {
     logo, scaled_logo,
     gold, diamond,
+    settings, x,
+    user_prof1, user_prof2, user_prof3, user_prof4, user_prof5,
     planet1, planet2, planet3, planet4, planet5,
     planetboss1, planetboss2, planetboss3, planetboss4, planetboss5,
     store, ship, stats, guild, wheel,

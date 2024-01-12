@@ -3,7 +3,7 @@ import { useState } from 'react';
 import {
 } from '../assets/img-import.js';
 
-export default function Stats() {
+export default function Stats({ playerState, planetState }) {
 
 
 
@@ -14,31 +14,31 @@ export default function Stats() {
                 <div className='stats-items-container'>
                     <div className='stats-item'>
                         <div>Current damage:</div>
-                        <div>1</div>
+                        <div>{playerState.currentDamage}</div>
                     </div>
                     <div className='stats-item'>
                         <div>Critical hit chance:</div>
-                        <div>2</div>
+                        <div>{`${playerState.critChance*10}%`}</div>
                     </div>
                     <div className='stats-item'>
                         <div>Total damage dealt:</div>
-                        <div>321312980</div>
+                        <div>{playerState.totalDamage}</div>
                     </div>
                     <div className='stats-item'>
                         <div>Highest level ever:</div>
-                        <div>475</div>
+                        <div>{planetState.maxLevel}</div>
                     </div>
                     <div className='stats-item'>
                         <div>Highest level stage:</div>
-                        <div>9</div>
+                        <div>{planetState.maxStage}</div>
                     </div>
                     <div className='stats-item'>
                         <div>Current gold:</div>
-                        <div>145</div>
+                        <div>{playerState.gold}</div>
                     </div>
                     <div className='stats-item'>
                         <div>Current diamonds:</div>
-                        <div>100</div>
+                        <div>{playerState.diamonds}</div>
                     </div>
                 </div>
             </div>

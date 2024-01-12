@@ -3,6 +3,8 @@ import {
   scaled_logo,
   gold,
   diamond,
+  settings,
+  user_prof1, user_prof2, user_prof3, user_prof4, user_prof5,
   planet1, planet2, planet3, planet4, planet5,
   /* planetboss1, planetboss2, planetboss3, planetboss4, planetboss5, */
   /* laserGunBlue, laserGunGreen, laserGunRed, */
@@ -16,6 +18,7 @@ import Guild from '../components/Guild';
 import Wheel from '../components/Wheel';
 import Planet from '../components/Planet';
 import Drawer from '../components/Drawer';
+import Settings from '../components/Settings';
 import extractStatus from '../auth/Register';
 //import { getRandomColor, handlePlanet, handleArrowLeft, handleArrowRight } from '../functions/GameFunctions';
 import { useState, useEffect } from 'react';
@@ -31,6 +34,9 @@ function Main() {
   const [socket, setSocket] = useState(null);
   const [userLogin, setUserLogin] = useState(null);
   const [show, setShow] = useState(0);
+  const [display, setDisplay] = useState({
+    settings: false,
+  });
   const [randomPlanet, setPlanet] = useState();
   const [randColor, setRandColor] = useState({
     randPlanet: '',
@@ -38,21 +44,34 @@ function Main() {
   });
   const [playerState, setPlayerState] = useState({
     gold: 100,
-    diamonds: 80,
+    diamonds: 100,
+    currentDamage: 1,
+    critChance: 0.1,
+    totalDamage: 0,
   });
   const [planetState, setPlanetState] = useState({
     currentHp: 100,
     maxHp: 100,
-    currentLevel: 8,
-    maxLevel: 8,
-    stage: 0,
+    currentLevel: 1,
+    maxLevel: 1,
+    currentStage: 0,
+    maxStage: 0,
+    name: '',
   });
   const [message, setMessage] = useState('mess');
 
   
-  const options = [<Store/>, <Ship/>, <Stats/>, <Guild/>, <Wheel/>];
+  const options = [<Store/>, <Ship/>, <Stats playerState={playerState} planetState={planetState}/>, <Guild/>, <Wheel/>];
 
   const planets = [planet1, planet2, planet3, planet4, planet5];
+
+  const namePlanet = [
+  'A', 'B', 'C', 'D', 'E', 'F', 
+  'G', 'H', 'I', 'J', 'K', 
+  'L', 'M', 'N', 'O', 'P', 
+  'Q', 'R', 'S', 'T', 'U', 
+  'V', 'W', 'X', 'Y', 'Z'
+  ];
 
   let planet = Math.floor(Math.random() * 5);
   let hueRotate = Math.floor(Math.random() * 359);
@@ -75,13 +94,9 @@ function Main() {
       return `rgb(${r}, ${g}, ${b})`;
   }
 
-  const initiatePlanet = () => {
-    let checkRandom = planet;
-    planet = Math.floor(Math.random() * 5);
-    hueRotate = Math.floor(Math.random() * 359);
-    if (planet === checkRandom) {planet = Math.abs(planet - 1);}
-    setPlanet(planet);
-    setRandColor({...randColor, randPlanet: getRandomColor(planet), randHue: hueRotate});
+  const generatePlanetName = () => {
+    let genName = `1${planetState.currentLevel}-${namePlanet[0]}${namePlanet[(planetState.currentLevel-1)%26]}${namePlanet[planetState.currentStage]}`;
+    setPlanetState({...planetState, name: genName});
   }
   
   const resetPlanet = () => {
@@ -91,28 +106,34 @@ function Main() {
     if (planet === checkRandom) {planet = Math.abs(planet - 1);}
     setPlanet(planet);
     setRandColor({...randColor, randPlanet: getRandomColor(planet), randHue: hueRotate});
+    generatePlanetName();
   }
 
   const handlePlanet = () => {
+    //console.log(`planetState.currentHp before: ${planetState.currentHp}`);
     
-    console.log(planetState.currentHp);
-    /*  
-    if (planetState.currentHp > 0) {setPlanetState(planetState => ({...planetState, currentHp: planetState.currentHp - data}))}
-    if (planetState.currentHp <= 0) {setPlanetState(planetState => ({...planetState, currentHp: 0}))} */
+    //console.log(planetState.currentHp);
     socket.emit('sendclick', 'User clicked');
 
     socket.on('receiveclick', function(data) {
       setPlanetState(planetState => ({...planetState, 
         currentHp: data.gameState.planet.currentHp,
+        maxHp: data.gameState.planet.maxHp,
         currentLevel: data.gameState.planet.currentLevel,
-        stage: data.gameState.planet.stage,
+        currentStage: data.gameState.planet.currentStage,
+        maxStage: data.gameState.planet.maxStage,
       }));
-
-      if (data.resetPlanet === true) {
-        resetPlanet();
-      }
     });
+
+    //console.log(`planetState.currentHp after: ${planetState.currentHp}`);
   }
+
+  useEffect(() => {
+    if (planetState.currentHp === planetState.maxHp) {
+      resetPlanet();
+    }
+  }, [planetState.currentHp]);
+
 
   /* socket.on('receive_setall', (gameState) => {
     console.log(`setall`);
@@ -121,11 +142,38 @@ function Main() {
 
   const handleArrowLeft = () => {
       console.log('Arrow Left');
+
+      socket.emit('arrowleft', 'clickedleftarrow');
+
+      socket.on('receivearrowleft', function(data) {
+        setPlanetState(planetState => ({...planetState, 
+          currentHp: data.gameState.planet.currentHp,
+          maxHp: data.gameState.planet.maxHp,
+          currentLevel: data.gameState.planet.currentLevel,
+          currentStage: data.gameState.planet.currentStage,
+        }));
+      });
+      
   }
 
   const handleArrowRight = () => {
       console.log('Arrow Right');
+
+      socket.emit('arrowright', 'clickedrightarrow');
+
+      socket.on('receivearrowright', function(data) {
+        setPlanetState(planetState => ({...planetState, 
+          currentHp: data.gameState.planet.currentHp,
+          maxHp: data.gameState.planet.maxHp,
+          currentLevel: data.gameState.planet.currentLevel,
+          currentStage: data.gameState.planet.currentStage,
+        }));
+      });
   }
+
+  useEffect(() => {
+    resetPlanet();
+  }, [planetState.currentLevel]);
 
   const navigate = useNavigate();
 
@@ -137,12 +185,19 @@ function Main() {
       setPlayerState(playerState => ({...playerState,
         gold: res.data.gold,
         diamonds: res.data.diamonds,
+
+        totalDamage: res.data.totaldamage,
       }));
       setPlanetState(planetState => ({...planetState, 
         currentLevel: res.data.currentlevel, 
         maxLevel: res.data.maxlevel,
-        stage: res.data.stage,
+        currentStage: res.data.currentstage,
+        maxStage: res.data.maxstage,
+
+        currentHp: res.data.currenthp,
+        maxHp: res.data.maxhp,
       }));
+
 
       const newSocket = io(`http://localhost:8000`);
       setSocket(newSocket);
@@ -163,7 +218,7 @@ function Main() {
 
   useEffect(() => {
     onLogin();
-    initiatePlanet();
+    resetPlanet();
 
   }, []);
 
@@ -178,6 +233,20 @@ function Main() {
         setErrData(`${extractStatus(err)}`);
     }
   }
+
+  const toggleSettings = () => {
+    if (display.settings === true) {
+      setDisplay(display => ({...display,
+        settings: false,
+      }));
+    } else {
+      setDisplay(display => ({...display,
+        settings: true,
+      }));
+    }
+    
+  }
+
   return (
     <>
       <div className='game-container'>
@@ -187,15 +256,19 @@ function Main() {
             <div><img src={scaled_logo} className='navbar-logo' alt='logo'></img></div>
           </div>
           <div className='navbar-right'>
-            <div>{message}</div>
-            <div>{userLogin}</div>
-            <div>Settings</div>
+            <div className='navbar-profile-container'>
+            <div className='navbar-profile-nickname'>{userLogin}</div>
+              <img className='navbar-profile-logo' src={user_prof1} alt='user-logo'></img>
+            </div>
+            <img src={settings} onClick={toggleSettings} alt='settings'></img>
             <form method='post' onSubmit={handleLogout}><button type='submit' name='submit'>Logout</button></form>
           </div>
           <div className='navbar-burger'>
             <div>Burgir</div>
           </div>
         </div>
+
+        {display.settings && <Settings toggleSettings={toggleSettings}></Settings>}
         
         <div className='main-container'>
           {/* <h1>Welcome to Main.jsx!</h1>

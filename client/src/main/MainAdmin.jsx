@@ -9,14 +9,14 @@ import {
   store, ship, stats, guild, wheel,
   skipArrowLeft, skipArrowRight,
 } from '../assets/img-import.js';
-import Store from '../components/Store.jsx';
-import Ship from '../components/Ship.jsx';
-import Stats from '../components/Stats.jsx';
-import Guild from '../components/Guild.jsx';
-import Wheel from '../components/Wheel.jsx';
-import Planet from '../components/Planet.jsx';
-import Drawer from '../components/Drawer.jsx';
-import extractStatus from '../auth/Register.jsx';
+import Store from '../components/Store';
+import Ship from '../components/Ship';
+import Stats from '../components/Stats';
+import Guild from '../components/Guild';
+import Wheel from '../components/Wheel';
+import Planet from '../components/Planet';
+import Drawer from '../components/Drawer';
+import extractStatus from '../auth/Register';
 //import { getRandomColor, handlePlanet, handleArrowLeft, handleArrowRight } from '../functions/GameFunctions';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -24,7 +24,9 @@ import axios from 'axios';
 import io from 'socket.io-client';
 
 
-function Main() {
+let count = 0;
+
+function MainAdmin() {
   const [errData, setErrData] = useState();
   const [socket, setSocket] = useState(null);
   const [userLogin, setUserLogin] = useState(null);
@@ -34,10 +36,15 @@ function Main() {
     randPlanet: '',
     randHue: '',
   });
+  const [playerState, setPlayerState] = useState({
+    gold: 100,
+    diamonds: 100,
+  });
   const [planetState, setPlanetState] = useState({
-    currentHp: 99,
+    currentHp: 100,
     maxHp: 100,
-    level: 8,
+    currentLevel: 1,
+    maxLevel: 1,
     stage: 0,
   });
   const [message, setMessage] = useState('mess');
@@ -77,25 +84,40 @@ function Main() {
     setRandColor({...randColor, randPlanet: getRandomColor(planet), randHue: hueRotate});
   }
   
-  const handlePlanet = () => {
+  const resetPlanet = () => {
     let checkRandom = planet;
     planet = Math.floor(Math.random() * 5);
     hueRotate = Math.floor(Math.random() * 359);
     if (planet === checkRandom) {planet = Math.abs(planet - 1);}
     setPlanet(planet);
     setRandColor({...randColor, randPlanet: getRandomColor(planet), randHue: hueRotate});
-    console.log(planetState.currentHp);
-    if (planetState.currentHp > 0) {setPlanetState(planetState => ({...planetState, currentHp: planetState.currentHp - 10}))}
-    if (planetState.currentHp <= 0) {setPlanetState(planetState => ({...planetState, currentHp: 0}))}
+  }
 
+  const handlePlanet = () => {
+    
+    console.log(planetState.currentHp);
+    /*  
+    if (planetState.currentHp > 0) {setPlanetState(planetState => ({...planetState, currentHp: planetState.currentHp - data}))}
+    if (planetState.currentHp <= 0) {setPlanetState(planetState => ({...planetState, currentHp: 0}))} */
     socket.emit('sendclick', 'User clicked');
 
-    socket.on('receiveclick', function(msg) {
-      console.log('clicked');
-      setMessage(msg);
+    socket.on('receiveclick', function(data) {
+      setPlanetState(planetState => ({...planetState, 
+        currentHp: data.gameState.planet.currentHp,
+        currentLevel: data.gameState.planet.currentLevel,
+        stage: data.gameState.planet.stage,
+      }));
+
+      if (data.resetPlanet === true) {
+        resetPlanet();
+      }
     });
-    
   }
+
+  /* socket.on('receive_setall', (gameState) => {
+    console.log(`setall`);
+    setPlanetState(planetState => ({...planetState, currentHp: gameState.planet.currentHp}));
+  }); */
 
   const handleArrowLeft = () => {
       console.log('Arrow Left');
@@ -112,7 +134,15 @@ function Main() {
       const res = await axios.get('/routes/mainadmin');
 
       setUserLogin(res.data.login);
-
+      setPlayerState(playerState => ({...playerState,
+        gold: res.data.gold,
+        diamonds: res.data.diamonds,
+      }));
+      setPlanetState(planetState => ({...planetState, 
+        currentLevel: res.data.currentlevel, 
+        maxLevel: res.data.maxlevel,
+        stage: res.data.stage,
+      }));
       const newSocket = io(`http://localhost:8000`);
       setSocket(newSocket);
       return () => newSocket.close();
@@ -148,7 +178,6 @@ function Main() {
             <div><img src={scaled_logo} className='navbar-logo' alt='logo'></img></div>
           </div>
           <div className='navbar-right'>
-            <div style={{fontSize: '12px'}}>Add gold, or whatever...</div>
             <div>{message}</div>
             <div>ADMIN:</div>
             <div>{userLogin}</div>
@@ -170,8 +199,8 @@ function Main() {
 
               <div className='main-content-container'>
                 <div className='money-display'>
-                  <div className='money-container'><img src={gold} className='money-logo' alt='gold'></img> 145</div>
-                  <div className='money-container'><img src={diamond} className='money-logo' alt='diamond'></img> 100</div>
+                  <div className='money-container'><img src={gold} className='money-logo' alt='gold'></img> {playerState.gold}</div>
+                  <div className='money-container'><img src={diamond} className='money-logo' alt='diamond'></img> {playerState.diamonds}</div>
                 </div>
                 {options[show]}
               </div>
@@ -199,4 +228,5 @@ function Main() {
   );
 }
 
-export default Main;
+export default MainAdmin;
+
