@@ -11,8 +11,23 @@ const router = express.Router();
 const registerQuery = `INSERT INTO users (email, login, password) VALUES (?)`;
 const loginQuery = `SELECT * FROM users WHERE login = ?`;
 const checkUser = `SELECT * FROM users WHERE email = ? OR login = ?`;
+const getMessages = `SELECT DISTINCT m.id, m.user, m.message, m.date_sent, m.guild_id, u.login 
+FROM messages AS m 
+JOIN users AS u ON u.id = m.user 
+JOIN guilds ON guilds.id = m.guild_id 
+JOIN game ON game.guild_id = guilds.id;`;
+const sendMessage = `INSERT INTO messages (id, user, message, date_sent, guild_id)
+SELECT NULL, u.id, ?, CURRENT_TIMESTAMP, gd.id
+FROM users u
+JOIN game g ON u.game_id = g.id
+JOIN guilds gd ON g.guild_id = gd.id
+WHERE u.id = ?`;
 
 global.userId = null;
+
+process.on('currentUserIdSet', (userId) => {
+    console.log(`currentUserIdSet: ${userId}`); //global variable for connected user
+});
 
 const checkAuth = (req, res, next) => {
     console.log('Cookie: ' + req.cookies);
@@ -46,6 +61,55 @@ const checkAuth = (req, res, next) => {
     });
     next();
 } */
+
+let queryAll = 'SELECT * FROM users JOIN game ON game.id = users.game_id JOIN guilds ON guilds.id = game.guild_id WHERE users.id = ?';
+
+const initialFetch = (playerid, res) => {
+    db.query(queryAll/* 'SELECT * FROM game JOIN users ON game.id = users.game_id WHERE users.id = ?' */, playerid, (err, data) => {
+        if (err) return res.status(500).json(err);
+        //console.log(data[0].login);
+
+        gameState.player.gold = Number(data[0].gold);
+        gameState.player.diamonds = Number(data[0].diamonds);
+        //gameState.player.currentDamage = 
+        //gameState.player.critChance
+        gameState.player.totalDamage = Number(data[0].totaldamage);
+
+
+        gameState.planet.currentLevel = Number(data[0].currentlevel);
+        gameState.planet.maxLevel = Number(data[0].maxlevel);
+        gameState.planet.currentStage = data[0].currentstage;
+        gameState.planet.maxStage = data[0].maxstage;
+
+        if (gameState.planet.currentLevel == 1) {
+            gameState.planet.maxHp = 10;
+            gameState.planet.currentHp = gameState.planet.maxHp;
+        } else {
+            gameState.planet.maxHp = (((gameState.planet.currentLevel*2)**2)) - gameState.planet.currentLevel**2;
+            gameState.planet.currentHp = gameState.planet.maxHp;
+        } //set hp onload to prevent the object defaults
+
+
+        console.log(`initialFetch: maxStage: ${gameState.planet.maxStage}`);
+        console.log(`initialFetch: currentStage: ${gameState.planet.currentStage}`);
+
+        return res.json({
+            login: data[0].login, admin: data[0].admin,
+            gold: data[0].gold,
+            diamonds: data[0].diamonds,
+
+            totaldamage: data[0].totaldamage,
+
+            currentlevel: data[0].currentlevel,
+            maxlevel: data[0].maxlevel,
+            currentstage: data[0].currentstage,
+            maxstage: data[0].maxstage,
+
+            currenthp: gameState.planet.currentHp,
+            maxhp: gameState.planet.maxHp,
+        });
+    });
+}
 
 
 const registerHandler = async (req, res) => {
@@ -123,26 +187,11 @@ router.get('/main', checkAuth, (req, res) => {
     console.log(`global.userId ${typeof global.userId}`);
     process.emit('currentUserIdSet', global.userId);
 
-    db.query('SELECT * FROM game JOIN users ON game.id = users.game_id WHERE users.id = ?', req.id, (err, data) => {
-        if (err) return res.status(500).json(err);
-        console.log(data[0].login);
+    initialFetch(req.id, res);
+    /* db.query(queryAll, (err, data) => {
+        console.log(data);
+    }); */
 
-        gameState.player.gold = Number(data[0].gold);
-        gameState.player.diamonds = Number(data[0].diamonds);
-        
-        gameState.planet.currentLevel = Number(data[0].currentlevel);
-        gameState.planet.maxLevel = Number(data[0].maxlevel);
-        gameState.planet.stage = data[0].stage;
-
-        return res.json({
-            login: data[0].login, admin: data[0].admin,
-            gold: data[0].gold,
-            diamonds: data[0].diamonds,
-            currentlevel: data[0].currentlevel,
-            maxlevel: data[0].maxlevel,
-            stage: data[0].stage,
-        });
-    });
 
     //SET GAME STATE
     /* db.query('SELECT * FROM game JOIN users ON game.id = users.game_id WHERE users.id = ?', req.id, (err, data) => {
@@ -162,12 +211,31 @@ router.get('/mainadmin', checkAuth, /* checkAdmin, */ (req, res) => {
         return res.json({login: data[0].login});
     }); */
 
-    db.query('SELECT * FROM users WHERE id = ?', req.id, (err, data) => {
+    /* db.query('SELECT * FROM users WHERE id = ?', req.id, (err, data) => {
         if (err) return res.status(500).json(err);
         console.log(data[0].login);
         return res.json({login: data[0].login, admin: data[0].admin});
-    });
+    }); */
+
+    initialFetch(req.id, res);
 })
+
+router.get('/guild', (req, res) => {
+    db.query(getMessages, (err, data) => {
+        if (err) throw err;
+        console.log(data);
+        res.send(data);
+    });
+});
+
+router.post('/guild', (req, res) => {
+    console.log(`guild_send userId: ${userId} ${req.body.input}`);
+    db.query(sendMessage, [req.body.input, userId], (err, data) => {
+        if (err) throw err;
+        console.log(data);
+        res.send(data);
+    });
+});
 
 
 router.post('/logout', (req, res) => {
