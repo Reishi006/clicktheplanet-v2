@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 11, 2024 at 10:57 AM
+-- Generation Time: Jan 12, 2024 at 05:45 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -45,7 +45,7 @@ CREATE TABLE `game` (
 
 INSERT INTO `game` (`id`, `gold`, `diamonds`, `currentlevel`, `maxlevel`, `currentstage`, `maxstage`, `totaldamage`, `guild_id`) VALUES
 (10, '420', '999', '1', '1', 9, 0, '', 0),
-(11, '2137', '120', '29', '29', 0, 0, '1337', 3),
+(11, '2137', '120', '36', '36', 0, 0, '1337', 3),
 (12, '100', '100', '19', '19', 8, 8, '', 3);
 
 -- --------------------------------------------------------
@@ -133,7 +133,13 @@ INSERT INTO `messages` (`id`, `user`, `message`, `date_sent`, `guild_id`) VALUES
 (5, '11', 'Nam faucibus ex metus, at sagittis augue maximus non. Ut vitae erat vitae elit cursus consequat. In aliquam iaculis ligula, eget posuere ligula lacinia sed. Ut scelerisque in velit ac feugiat. Nunc sed risus rhoncus neque mollis congue eu at nunc. Donec quis consequat purus, ac facilisis purus.', '2024-01-11 08:24:02', 3),
 (6, '10', 'Hello I\'m from a different guild!', '2024-01-11 08:24:06', 4),
 (7, '11', 'I\'m from this guild! Galaxy conquerors', '2024-01-11 08:24:10', 3),
-(8, '12', 'I\'m Most Strongest Potato hello!', '2024-01-11 08:46:50', 3);
+(8, '12', 'I\'m Most Strongest Potato hello!', '2024-01-11 08:46:50', 3),
+(9, '12', 'Sending messages test!!!', '2024-01-11 20:53:08', 3),
+(13, '12', 'Some message2', '2024-01-11 21:03:41', 3),
+(21, '11', 'awdawdad', '2024-01-11 21:25:56', 3),
+(33, '11', 'asdads', '2024-01-11 21:40:12', 3),
+(34, '11', 'Input test', '2024-01-11 21:40:24', 3),
+(35, '12', 'Hello Qwe!', '2024-01-11 21:42:45', 3);
 
 -- --------------------------------------------------------
 
@@ -232,7 +238,7 @@ ALTER TABLE `invitations`
 -- AUTO_INCREMENT for table `messages`
 --
 ALTER TABLE `messages`
-  MODIFY `id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT for table `users`
