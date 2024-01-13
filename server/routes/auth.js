@@ -1,11 +1,9 @@
 const express = require('express');
-const { Server } = require('socket.io')
 const db = require('../db.js');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const gameState = require('../game/gameStateObj.js');
-
 const router = express.Router();
 
 const registerQuery = `INSERT INTO users (email, login, password) VALUES (?)`;
@@ -71,8 +69,9 @@ const initialFetch = (playerid, res) => {
 
         gameState.player.gold = Number(data[0].gold);
         gameState.player.diamonds = Number(data[0].diamonds);
-        //gameState.player.currentDamage = 
+        
         //gameState.player.critChance
+        gameState.player.currentDamage = Number(data[0].currentdamage);
         gameState.player.totalDamage = Number(data[0].totaldamage);
 
 
@@ -81,13 +80,10 @@ const initialFetch = (playerid, res) => {
         gameState.planet.currentStage = data[0].currentstage;
         gameState.planet.maxStage = data[0].maxstage;
 
-        if (gameState.planet.currentLevel == 1) {
-            gameState.planet.maxHp = 10;
-            gameState.planet.currentHp = gameState.planet.maxHp;
-        } else {
-            gameState.planet.maxHp = (((gameState.planet.currentLevel*2)**2)) - gameState.planet.currentLevel**2;
-            gameState.planet.currentHp = gameState.planet.maxHp;
-        } //set hp onload to prevent the object defaults
+        gameState.planet.maxHp = data[0].maxhp;
+        gameState.planet.currentHp = gameState.planet.maxHp;
+        
+        //set hp onload to prevent the object defaults
 
 
         console.log(`initialFetch: maxStage: ${gameState.planet.maxStage}`);
@@ -98,6 +94,7 @@ const initialFetch = (playerid, res) => {
             gold: data[0].gold,
             diamonds: data[0].diamonds,
 
+            currentdamage: data[0].currentdamage,
             totaldamage: data[0].totaldamage,
 
             currentlevel: data[0].currentlevel,
@@ -105,8 +102,8 @@ const initialFetch = (playerid, res) => {
             currentstage: data[0].currentstage,
             maxstage: data[0].maxstage,
 
-            currenthp: gameState.planet.currentHp,
-            maxhp: gameState.planet.maxHp,
+            currenthp: data[0].maxhp,
+            maxhp: data[0].maxhp,
         });
     });
 }
@@ -223,7 +220,7 @@ router.get('/mainadmin', checkAuth, /* checkAdmin, */ (req, res) => {
 router.get('/guild', (req, res) => {
     db.query(getMessages, (err, data) => {
         if (err) throw err;
-        console.log(data);
+        //console.log(data);
         res.send(data);
     });
 });
