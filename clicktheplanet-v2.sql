@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 13, 2024 at 07:51 PM
+-- Generation Time: Jan 13, 2024 at 09:14 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -48,7 +48,7 @@ CREATE TABLE `game` (
 
 INSERT INTO `game` (`id`, `gold`, `diamonds`, `currentlevel`, `maxlevel`, `currentstage`, `maxstage`, `currenthp`, `maxhp`, `currentdamage`, `totaldamage`, `guild_id`) VALUES
 (10, '420', '999', '1', '1', 9, 0, '', '', '', '', 0),
-(11, '2137', '120', '228', '228', 5, 5, '155952', '155952', '100000', '1337', 3),
+(11, '2137', '120', '232', '232', 4, 4, '161472', '161472', '100000', '1337', 3),
 (12, '100', '100', '20', '20', 6, 6, '', '', '', '', 3);
 
 -- --------------------------------------------------------
@@ -113,6 +113,26 @@ INSERT INTO `invitations` (`id`, `guild_id`, `user_id`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `items`
+--
+
+CREATE TABLE `items` (
+  `id` int(11) NOT NULL,
+  `name` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `items`
+--
+
+INSERT INTO `items` (`id`, `name`) VALUES
+(1, 'Blue Laser Gun'),
+(2, 'Green Laser Gun'),
+(3, 'Red Laser Gun');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `messages`
 --
 
@@ -164,6 +184,31 @@ INSERT INTO `users` (`id`, `email`, `login`, `password`, `admin`, `game_id`) VAL
 (11, 'qwe@mail.com', 'Qwe', '$2a$10$lINez2/4OXVjAVtY5Ajr/uw/S5vaIPGq.JCPq6Hki0SkmIbXSblRC', 0, 11),
 (12, 'moststrongestpotato@mail.com', 'MostStrongestPotato', '$2a$10$MSNS3Qq8/744On2MeolpTOyu6fvCnxIS3A8BNVMBNpJ8.i/koUEW.', 0, 12);
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users_items`
+--
+
+CREATE TABLE `users_items` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `item_id` int(11) NOT NULL,
+  `level` varchar(50) NOT NULL,
+  `cost` varchar(50) NOT NULL,
+  `damage` varchar(50) NOT NULL,
+  `locked` tinyint(1) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `users_items`
+--
+
+INSERT INTO `users_items` (`id`, `user_id`, `item_id`, `level`, `cost`, `damage`, `locked`) VALUES
+(1, 11, 1, '1', '100', '1', 0),
+(2, 11, 2, '1', '1000', '10', 0),
+(3, 11, 3, '0', '2500', '0', 1);
+
 --
 -- Indexes for dumped tables
 --
@@ -193,6 +238,12 @@ ALTER TABLE `invitations`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `items`
+--
+ALTER TABLE `items`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `messages`
 --
 ALTER TABLE `messages`
@@ -204,6 +255,12 @@ ALTER TABLE `messages`
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
   ADD KEY `game_id` (`game_id`);
+
+--
+-- Indexes for table `users_items`
+--
+ALTER TABLE `users_items`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -234,6 +291,12 @@ ALTER TABLE `invitations`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
+-- AUTO_INCREMENT for table `items`
+--
+ALTER TABLE `items`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
 -- AUTO_INCREMENT for table `messages`
 --
 ALTER TABLE `messages`
@@ -244,6 +307,12 @@ ALTER TABLE `messages`
 --
 ALTER TABLE `users`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+--
+-- AUTO_INCREMENT for table `users_items`
+--
+ALTER TABLE `users_items`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
