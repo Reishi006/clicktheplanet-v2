@@ -3,12 +3,13 @@ import {
   scaled_logo,
   gold,
   diamond,
-  settings,
+  bell, settings,
   user_prof1, user_prof2, user_prof3, user_prof4, user_prof5,
   planet1, planet2, planet3, planet4, planet5,
-  /* planetboss1, planetboss2, planetboss3, planetboss4, planetboss5, */
+  planetboss1, planetboss2, planetboss3, planetboss4, planetboss5,
   /* laserGunBlue, laserGunGreen, laserGunRed, */
   store, ship, stats, guild, wheel,
+  hitGrad,
   skipArrowLeft, skipArrowRight,
 } from '../assets/img-import.js';
 import Store from '../components/Store';
@@ -21,15 +22,18 @@ import Drawer from '../components/Drawer';
 import Settings from '../components/Settings';
 import extractStatus from '../auth/Register';
 //import { getRandomColor, handlePlanet, handleArrowLeft, handleArrowRight } from '../functions/GameFunctions';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import io from 'socket.io-client';
+//import gameState from '../../../server/game/gameState.js';
 
 
-let count = 0;
+
 
 function Main() {
+  const damageDisplayRef = useRef(null);
+
   const [errData, setErrData] = useState();
   const [socket, setSocket] = useState(null);
   const [userLogin, setUserLogin] = useState(null);
@@ -37,6 +41,7 @@ function Main() {
   const [display, setDisplay] = useState({
     settings: false,
   });
+  const [coords, setCoords] = useState({x: 0, y: 0});
   const [randomPlanet, setPlanet] = useState();
   const [randColor, setRandColor] = useState({
     randPlanet: '',
@@ -57,13 +62,17 @@ function Main() {
     currentStage: 0,
     maxStage: 0,
     name: '',
+
+    reset: false,
   });
-  const [message, setMessage] = useState('mess');
+
+  const [planetScale, setPlanetScale] = useState(0.5);
 
   
   const options = [<Store/>, <Ship/>, <Stats playerState={playerState} planetState={planetState}/>, <Guild/>, <Wheel/>];
 
   const planets = [planet1, planet2, planet3, planet4, planet5];
+  const planetsBosses = [planetboss1, planetboss2, planetboss3, planetboss4, planetboss5];
 
   const namePlanet = [
   'A', 'B', 'C', 'D', 'E', 'F', 
@@ -72,6 +81,11 @@ function Main() {
   'Q', 'R', 'S', 'T', 'U', 
   'V', 'W', 'X', 'Y', 'Z'
   ];
+
+  const namePlanetBosses = [
+    'Inhabited planet', 'White dwarf', 'Red dwarf', 'Black Hole'
+  ];
+
 
   let planet = Math.floor(Math.random() * 5);
   let hueRotate = Math.floor(Math.random() * 359);
@@ -98,61 +112,146 @@ function Main() {
     let genName = `1${planetState.currentLevel}-${namePlanet[0]}${namePlanet[(planetState.currentLevel-1)%26]}${namePlanet[planetState.currentStage]}`;
     setPlanetState({...planetState, name: genName});
   }
-  
-  const resetPlanet = () => {
-    let checkRandom = planet;
-    planet = Math.floor(Math.random() * 5);
-    hueRotate = Math.floor(Math.random() * 359);
-    if (planet === checkRandom) {planet = Math.abs(planet - 1);}
-    setPlanet(planet);
-    setRandColor({...randColor, randPlanet: getRandomColor(planet), randHue: hueRotate});
-    generatePlanetName();
+
+  useEffect(() => {
+    const handleWindowMouseMove = event => {
+      setCoords({
+        x: event.clientX,
+        y: event.clientY,
+      });
+    };
+    window.addEventListener('mousemove', handleWindowMouseMove);
+
+    return () => {
+      window.removeEventListener(
+        'mousemove',
+        handleWindowMouseMove,
+      );
+    };
+  }, []);
+
+  const displayDamageOverlay = () => {
+    if (!damageDisplayRef.current) return;
+
+    const newDamageDisplay = document.createElement('div');
+    newDamageDisplay.textContent = `-${playerState.currentDamage}hp`;
+    newDamageDisplay.className = 'planet-damage-display';
+
+    const planetPosition = damageDisplayRef.current.getBoundingClientRect();
+    const randomX = Math.random() * planetPosition.width;
+    const randomY = Math.random() * planetPosition.height;
+
+    newDamageDisplay.style.left = `${planetPosition.left + randomX}px`;
+    newDamageDisplay.style.top = `${planetPosition.top + randomY}px`;
+
+    document.body.appendChild(newDamageDisplay);
+
+    setTimeout(() => {
+      document.body.removeChild(newDamageDisplay);
+    }, 1500);
+  }
+
+  const displayHitSvg = () => {
+    const hitSvg = document.createElement('div');
+
+    hitSvg.className = 'planet-hit-svg';
+
+    const x = coords.x;
+    const y = coords.y;
+
+    hitSvg.style.top = `calc(${y}px - 50px)`;/* `${y - hitSvg.height / 4}px`; */
+    hitSvg.style.left = `calc(${x}px - 50px)`/* `${x - hitSvg.width / 4}px`; */
+
+    document.body.appendChild(hitSvg);
+
+    setTimeout(() => {
+      document.body.removeChild(hitSvg);
+    }, 700);
+  }
+
+ 
+
+  const resetPlanet = (s, bool) => {
+      //NOT BOSS
+      setPlanetScale(s);
+      generatePlanetName();
+
+      if (bool) {
+        setTimeout(() => {
+          let checkRandom = planet;
+          planet = Math.floor(Math.random() * 5);
+          hueRotate = Math.floor(Math.random() * 359);
+          if (planet === checkRandom) {planet = Math.abs(planet - 1);}
+          setPlanet(planet);
+          setRandColor({...randColor, randPlanet: getRandomColor(planet), randHue: hueRotate});
+          setPlanetScale(1);
+        }, 300);
+      } else if (!bool) {
+        let checkRandom = planet;
+        planet = Math.floor(Math.random() * 5);
+        hueRotate = Math.floor(Math.random() * 359);
+        if (planet === checkRandom) {planet = Math.abs(planet - 1);}
+        setPlanet(planet);
+        setRandColor({...randColor, randPlanet: getRandomColor(planet), randHue: hueRotate});
+      }
   }
 
   const handlePlanet = () => {
-    //console.log(`planetState.currentHp before: ${planetState.currentHp}`);
-    
-    //console.log(planetState.currentHp);
-    socket.emit('sendclick', 'User clicked');
+      socket.emit('sendclick', 'User clicked');
 
-    socket.on('receiveclick', function(data) {
-      setPlanetState(planetState => ({...planetState, 
-        currentHp: data.gameState.planet.currentHp,
-        maxHp: data.gameState.planet.maxHp,
-        currentLevel: data.gameState.planet.currentLevel,
-        currentStage: data.gameState.planet.currentStage,
-        maxStage: data.gameState.planet.maxStage,
-      }));
-    });
+      socket.once('receiveclick', function(data) {
 
-    //console.log(`planetState.currentHp after: ${planetState.currentHp}`);
+        setPlanetState({...planetState, 
+          currentHp: data.gameState.planet.currentHp,
+          maxHp: data.gameState.planet.maxHp,
+          currentLevel: data.gameState.planet.currentLevel,
+          maxLevel: data.gameState.planet.maxLevel,
+          currentStage: data.gameState.planet.currentStage,
+          maxStage: data.gameState.planet.maxStage,
+          reset: data.reset,
+        });
+
+
+        setPlayerState(playerState => ({...playerState,
+          currentDamage: data.gameState.player.currentDamage,
+        }));
+      });
+
+      displayDamageOverlay();
+      displayHitSvg();
+
+      //console.log('from react handlePlanet: '+planetState.currentLevel);
   }
 
   useEffect(() => {
-    if (planetState.currentHp === planetState.maxHp) {
-      resetPlanet();
+    if (planetState.reset === true) {
+      //console.log(planetState.reset);
+      resetPlanet(0.01, true);
     }
-  }, [planetState.currentHp]);
+  }, [planetState.reset]);
 
+  useEffect(() => {
+    resetPlanet(0.01, true);
+  }, [planetState.maxStage]);
 
-  /* socket.on('receive_setall', (gameState) => {
-    console.log(`setall`);
-    setPlanetState(planetState => ({...planetState, currentHp: gameState.planet.currentHp}));
-  }); */
 
   const handleArrowLeft = () => {
       console.log('Arrow Left');
 
       socket.emit('arrowleft', 'clickedleftarrow');
 
-      socket.on('receivearrowleft', function(data) {
-        setPlanetState(planetState => ({...planetState, 
+      socket.once('receivearrowleft', function(data) {
+        console.log(data.gameState.planet.maxHp);
+        setPlanetState({...planetState, 
           currentHp: data.gameState.planet.currentHp,
           maxHp: data.gameState.planet.maxHp,
           currentLevel: data.gameState.planet.currentLevel,
+          maxLevel: data.gameState.planet.maxLevel,
           currentStage: data.gameState.planet.currentStage,
-        }));
+          reset: data.reset,
+        });
       });
+      if (planetState.currentLevel > 1) resetPlanet(1, false);
       
   }
 
@@ -161,19 +260,27 @@ function Main() {
 
       socket.emit('arrowright', 'clickedrightarrow');
 
-      socket.on('receivearrowright', function(data) {
-        setPlanetState(planetState => ({...planetState, 
+      socket.once('receivearrowright', function(data) {
+        
+        setPlanetState({...planetState, 
           currentHp: data.gameState.planet.currentHp,
           maxHp: data.gameState.planet.maxHp,
           currentLevel: data.gameState.planet.currentLevel,
+          maxLevel: data.gameState.planet.maxLevel,
           currentStage: data.gameState.planet.currentStage,
-        }));
+          reset: data.reset,
+        });
+        console.log(data.gameState.planet.currentLevel);
       });
+      if (planetState.currentLevel !== planetState.maxLevel) resetPlanet(1, false);
   }
 
-  useEffect(() => {
-    resetPlanet();
-  }, [planetState.currentLevel]);
+  const getData = () => {
+
+    socket.on('receiveload', (data) => {
+      console.log(data);
+    });
+  }
 
   const navigate = useNavigate();
 
@@ -186,6 +293,7 @@ function Main() {
         gold: res.data.gold,
         diamonds: res.data.diamonds,
 
+        currentDamage: res.data.currentdamage,
         totalDamage: res.data.totaldamage,
       }));
       setPlanetState(planetState => ({...planetState, 
@@ -198,27 +306,27 @@ function Main() {
         maxHp: res.data.maxhp,
       }));
 
-
       const newSocket = io(`http://localhost:8000`);
       setSocket(newSocket);
+      
 
       if (res.data.admin === 1) {
         //newSocket.close();
         return navigate('../mainadmin');
       }
-
+      
       return () => newSocket.close();
 
 
     } catch (error) {
-      console.log('/main error');
+      console.log('/main error ' + error);
       navigate('../unauthorized');
     }
   }
 
   useEffect(() => {
     onLogin();
-    resetPlanet();
+    resetPlanet(0.01, true);
 
   }, []);
 
@@ -257,8 +365,12 @@ function Main() {
           </div>
           <div className='navbar-right'>
             <div className='navbar-profile-container'>
-            <div className='navbar-profile-nickname'>{userLogin}</div>
+              <div className='navbar-profile-nickname'>{userLogin}</div>
               <img className='navbar-profile-logo' src={user_prof1} alt='user-logo'></img>
+            </div>
+            <div className='navbar-bell-container'>
+              <img className='navbar-bell' src={bell} alt='notifications'></img>
+              <div className='navbar-bell-notification'>1</div>
             </div>
             <img src={settings} onClick={toggleSettings} alt='settings'></img>
             <form method='post' onSubmit={handleLogout}><button type='submit' name='submit'>Logout</button></form>
@@ -290,8 +402,11 @@ function Main() {
           
           <div className='main-right'>
             <Planet
+              damageDisplayRef={damageDisplayRef}
+
               randColor={randColor}
               planets={planets}
+              planetsBosses={planetsBosses}
               randomPlanet={randomPlanet}
               handlePlanet={handlePlanet}
               handleArrowLeft={handleArrowLeft}
@@ -300,6 +415,7 @@ function Main() {
               skipArrowRight={skipArrowRight}
               planetState={planetState}
               setPlanetState={setPlanetState}
+              planetScale={planetScale}
             ></Planet>
           </div>
         </div>

@@ -2,6 +2,7 @@ import logo from '../assets/env/small_Logo_CtP.png';
 import scaled_logo from '../assets/env/small_scaled_Logo_CtP.png';
 import gold from '../assets/env/smaller_gold.png';
 import diamond from '../assets/env/smaller_diamond.png';
+import bell from '../assets/env/bell.svg';
 import settings from '../assets/env/settings.svg';
 import x from '../assets/env/x.svg';
 import user_prof1 from '../assets/profile/user_prof1.svg';
@@ -46,7 +47,7 @@ import skipArrowRight from '../assets/env/skip-arrow-right.svg';
 export {
     logo, scaled_logo,
     gold, diamond,
-    settings, x,
+    bell, settings, x,
     user_prof1, user_prof2, user_prof3, user_prof4, user_prof5,
     planet1, planet2, planet3, planet4, planet5,
     planetboss1, planetboss2, planetboss3, planetboss4, planetboss5,

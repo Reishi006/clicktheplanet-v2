@@ -1,62 +1,69 @@
 import '../main/Main.css';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import {
 } from '../assets/img-import.js';
 import axios from 'axios';
 import io from 'socket.io-client';
 
 export default function Guild() {
+    const messagesEndRef = useRef(null);
+
     const [messages, setMessages] = useState([]);
     const [socket, setSocket] = useState(null);
     const [errData, setErrData] = useState();
     const [input, setInput] = useState('');
 
-    const messagesObj = '';
 
 
     const handleInput = (e) => {
         setInput(e.target.value);
         console.log(e.target.value);
       }
+
+    let newMessage = '';
     
     const handleSubmit = async (e) => {
         e.preventDefault();
         console.log(`handleSubmit input: ${input}`);
         try {
-            const res = await axios.post('/routes/guild', {input});
-            console.log(res.data);
-            console.log('Guilds: message sent'+ input);
+            if (input !== '') {
+                const res = await axios.post('/routes/guild', {input});
+                console.log(res.data);
+                console.log('Guilds: message sent'+ input);
+
+
+                socket.emit('inputsubmit', input);
+                
+                socket.once('receiveinputsubmit', function(data) {
+
+                    newMessage = data;
+                    console.log(`newMessage: ${newMessage} data ${data}`);
+                    setMessages(prevMessages => [...prevMessages, newMessage]);
+                });
+                
+            }
+
             setInput('');
         } catch (err) {
             setErrData(err);
         }
     }
 
+    const scrollToBottom = () => { messagesEndRef.current?.scrollTo(0, messagesEndRef.current?.scrollHeight); };
+    
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
+
     const onLoad = async () => {
         try {
             const res = await axios.get('/routes/guild');
 
             setMessages(res.data);
-            console.log(typeof res.data);
-
-            /* messagesObj = messages.map((row) => {
-                return (
-                    <div key={row.id}>
-                        {row.user}: {row.message} / {new Date(row.date_sent).toString()}
-                    </div>
-                );
-            })
- */
-            //console.log(message);
-
-            /* const mappedMessages = messages.map((messages) => {
-                <div key={messages.}></div>
-            }); */
+            console.log(`messages: ${res.data}`);
 
             const newSocket = io(`http://localhost:8000`);
             setSocket(newSocket);
-
-            console.log(`guild`);
 
             return () => newSocket.close();
 
@@ -68,7 +75,6 @@ export default function Guild() {
 
     useEffect(() => {
     onLoad();
-
     }, []);
 
     return (
@@ -76,7 +82,7 @@ export default function Guild() {
             <div className='menu-container'>
                 <div className='title'>Guild</div>
                 <div className='guild-container'>
-                    <div className='guild-chat'>
+                    <div className='guild-chat' ref={messagesEndRef}>
                         {messages && messages.map((row) => {
 
                             const date = new Date(row.date_sent);
@@ -90,19 +96,20 @@ export default function Guild() {
 
                             return (
                                 <div className='guild-message' key={row.id}>
+                                    <div className='guild-message-upper'>
+                                        <div className='guild-user'>{row.login}:</div>
+                                        <div className='sent-date'>{formattedDate/* new Date(row.date_sent).toString() */}</div>
+                                    </div>
                                     <div className='guild-message-sent'>
-                                        <div className='guild-user'>{row.login}:</div> 
                                         <div className='guild-sent'>{row.message}</div>
                                     </div>
-                                    <div className='sent-date'>{formattedDate/* new Date(row.date_sent).toString() */}</div>
                                 </div>
                             );
                         })}
-
-                        
+                        <div />      
                     </div>
                     <div className='guild-input-container'>
-                        <form method='post' onSubmit={handleSubmit}>
+                        <form method='post' autoComplete="off" onSubmit={handleSubmit}>
                             <input className='guild-chat-input' name='input' type='text' value={input} onChange={handleInput} placeholder='Type something'></input>
                             <button type='submit' className='guild-chat-btn' name='submit'>Send</button>
                         </form>

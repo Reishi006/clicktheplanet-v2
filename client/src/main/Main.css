@@ -91,17 +91,38 @@ form {
 }
 
 .navbar-profile-container > div {
-    margin: .2em .5em;
+    margin: .2em 1em;
 }
 
 .navbar-profile-logo {
-    margin: 0 auto;
+    /* margin: 0 auto; */
     width: 2em;
 }
 
 .navbar-profile-nickname {
     justify-content: center;
     align-items: center;
+}
+
+.navbar-bell-container {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+}
+
+.navbar-bell {
+    width: 2.5em;
+    height: 2.5em;
+}
+
+.navbar-bell-notification {
+    width: 1.5em;
+    height: 1.5em;
+    position: absolute;
+    left: 55%;
+    background-color: red;
+    font-size: 14px;
+    border-radius: 100%;
 }
 
 .navbar-settings {
@@ -440,23 +461,33 @@ form {
     flex-direction: row;
 }
 
+.guild-message-upper {
+    display: flex;
+    justify-content: center;
+}
+
 .guild-user {
+    flex: 1;
     margin: .2em 1em .2em .2em;
     font-size: var(--panelsFont);
+    text-align: left;
 }
 
 .guild-sent {
     margin: .2em;
     text-align: left;
     font-size: 14px;
-    color: rgb(231, 231, 231);
+    color: rgb(190, 190, 190);
+    overflow-wrap: break-word;
+    word-break: break-all;
 }
 
 .sent-date {
+    flex: 1;
     margin: .5em;
     text-align: right;
     font-size: 11px;
-    color: rgb(180, 180, 180);
+    color: rgb(170, 170, 170);
 }
 
 .guild-input-container {
@@ -514,6 +545,7 @@ form {
 }
 
 .planet-img {
+    position: relative;
     width: 33%;
     margin: 1em;
     animation: 3s movement ease-in-out infinite, 4s breathe ease-in-out infinite;
@@ -530,6 +562,85 @@ form {
     0% {transform: translateY(0);}
     50% {transform: translateY(2%);}
     100% {transform: translateY(0);}
+}
+
+.planet-damage-display {
+    position: absolute;
+    font-size: 18px;
+    color: rgba(214, 0, 0, 1.0);
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    animation: damageAnimation 1.5s ease-in-out;
+    z-index: 2;
+    pointer-events: none;
+}
+
+@keyframes damageAnimation {
+    0% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+  
+    50% {
+        opacity: 0.7;
+        transform: translateY(-30px);
+    }
+  
+    100% {
+        opacity: 0;
+        transform: translateY(-60px);
+    }
+}
+  
+  @keyframes critDamageAnimation {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+        transform: translateX(0);
+    }
+  
+    2%, 14% {
+      transform: translateX(-10px);
+    }
+  
+    5%, 11%, 17% {
+      transform: translateX(0);
+    }
+  
+    8% {
+      transform: translateX(10px);
+    }
+  
+    50% {
+        opacity: 0.7;
+        transform: translateY(-30px);
+    }
+  
+    to {
+        opacity: 0;
+        transform: translateY(-60px);
+    }
+}
+
+.planet-hit-svg {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    background: rgb(255,0,0);
+    background: radial-gradient(circle, rgba(212, 113, 0, 1.0) 0%, rgba(223, 26, 0, 0.7) 30%, rgba(255,0,0,0.0) 50%,rgba(184,184,184,0.0) 100%);
+    z-index: 2;
+    pointer-events: none;
+    animation: hitSvgAnimation 0.7s ease-in-out;
+}
+
+@keyframes hitSvgAnimation {
+    0% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
 }
 
 .advance-arrow-left, .advance-arrow-right {
@@ -573,6 +684,7 @@ form {
     height: inherit;
     background: linear-gradient(90deg, #97ff9f 0%, rgb(0, 255, 13) 100%);
     border-radius: inherit;
+    transition: width 0.3s;
 }
 
 .spacer-div {

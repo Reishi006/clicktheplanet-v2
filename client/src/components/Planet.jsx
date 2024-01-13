@@ -1,8 +1,11 @@
 import { useState } from 'react';
 
 export default function Planet({ 
+    damageDisplayRef,
+
     randColor, 
-    planets, 
+    planets,
+    planetsBosses,
     randomPlanet, 
     handlePlanet, 
     handleArrowLeft, 
@@ -11,13 +14,14 @@ export default function Planet({
     skipArrowRight,
     planetState,
     setPlanetState,
+    planetScale,
 }) {
 
     return (
         <>
             <div className='planet-state'>
                 <div className='planet-level'>Level: {planetState.currentLevel}</div>
-                <div className='planet-stage'>{planetState.currentStage}/10</div>
+                <div className='planet-stage'>{planetState.currentStage}/{(planetState.currentLevel % 10 === 0) ? 1 : 10}</div>
                 <div className='planet-name'>{planetState.name}</div>
             </div>
 
@@ -26,13 +30,22 @@ export default function Planet({
                 <div className='main-planet' 
                 style={{ 
                     '--breatheColor' : randColor.randPlanet,
-                    filter : `hue-rotate(${randColor.randHue}deg)`,
+                    filter : 
+                        `hue-rotate(${randColor.randHue}deg) 
+                        grayscale(${100-((planetState.currentHp * 100)/planetState.maxHp)}%)
+                        brightness(${150-((planetState.currentHp * 100)/planetState.maxHp)/2}%)
+                        `,
                 }}
                 >
                     <img 
-                        src={planets[randomPlanet]} 
+                        src={(planetState.currentLevel % 10 === 0) ? planetsBosses[randomPlanet] : planets[randomPlanet]} 
                         className='planet-img'
-                        onClick={()=>handlePlanet()} 
+                        ref={damageDisplayRef}
+                        style={{
+                            scale: `${planetScale}`,
+                            transition: `scale 0.3s ease-out`,
+                        }}
+                        onClick={()=>handlePlanet()}
                         alt='planet'
                     ></img>
                     <div className='advance-arrow-left' onClick={handleArrowLeft}>
@@ -53,7 +66,11 @@ export default function Planet({
                 <div className='planet-health-text'>HP: {planetState.currentHp}/{planetState.maxHp}</div>
                 <div className='planet-health-container'>
                     <div className='planet-health-under'>
-                        <div className='planet-health' style={{ width: `${(planetState.currentHp * 100)/planetState.maxHp}%` }}></div>
+                        <div className='planet-health' 
+                        style={{ 
+                            width: `${(planetState.currentHp * 100)/planetState.maxHp}%`,
+                        }}
+                        ></div>
                     </div>
                 </div>
 
