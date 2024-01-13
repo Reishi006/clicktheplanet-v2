@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 13, 2024 at 07:01 PM
+-- Generation Time: Jan 13, 2024 at 07:51 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -35,6 +35,8 @@ CREATE TABLE `game` (
   `maxlevel` varchar(50) NOT NULL,
   `currentstage` int(2) NOT NULL,
   `maxstage` int(2) NOT NULL,
+  `currenthp` varchar(50) NOT NULL,
+  `maxhp` varchar(50) NOT NULL,
   `currentdamage` varchar(50) NOT NULL,
   `totaldamage` varchar(50) NOT NULL,
   `guild_id` int(11) NOT NULL
@@ -44,10 +46,10 @@ CREATE TABLE `game` (
 -- Dumping data for table `game`
 --
 
-INSERT INTO `game` (`id`, `gold`, `diamonds`, `currentlevel`, `maxlevel`, `currentstage`, `maxstage`, `currentdamage`, `totaldamage`, `guild_id`) VALUES
-(10, '420', '999', '1', '1', 9, 0, '', '', 0),
-(11, '2137', '120', '210', '212', 1, 6, '100000', '1337', 3),
-(12, '100', '100', '20', '20', 6, 6, '', '', 3);
+INSERT INTO `game` (`id`, `gold`, `diamonds`, `currentlevel`, `maxlevel`, `currentstage`, `maxstage`, `currenthp`, `maxhp`, `currentdamage`, `totaldamage`, `guild_id`) VALUES
+(10, '420', '999', '1', '1', 9, 0, '', '', '', '', 0),
+(11, '2137', '120', '228', '228', 5, 5, '155952', '155952', '100000', '1337', 3),
+(12, '100', '100', '20', '20', 6, 6, '', '', '', '', 3);
 
 -- --------------------------------------------------------
 
