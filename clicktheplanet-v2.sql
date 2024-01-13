@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 12, 2024 at 05:45 AM
+-- Generation Time: Jan 13, 2024 at 07:01 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -35,6 +35,7 @@ CREATE TABLE `game` (
   `maxlevel` varchar(50) NOT NULL,
   `currentstage` int(2) NOT NULL,
   `maxstage` int(2) NOT NULL,
+  `currentdamage` varchar(50) NOT NULL,
   `totaldamage` varchar(50) NOT NULL,
   `guild_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -43,10 +44,10 @@ CREATE TABLE `game` (
 -- Dumping data for table `game`
 --
 
-INSERT INTO `game` (`id`, `gold`, `diamonds`, `currentlevel`, `maxlevel`, `currentstage`, `maxstage`, `totaldamage`, `guild_id`) VALUES
-(10, '420', '999', '1', '1', 9, 0, '', 0),
-(11, '2137', '120', '36', '36', 0, 0, '1337', 3),
-(12, '100', '100', '19', '19', 8, 8, '', 3);
+INSERT INTO `game` (`id`, `gold`, `diamonds`, `currentlevel`, `maxlevel`, `currentstage`, `maxstage`, `currentdamage`, `totaldamage`, `guild_id`) VALUES
+(10, '420', '999', '1', '1', 9, 0, '', '', 0),
+(11, '2137', '120', '210', '212', 1, 6, '100000', '1337', 3),
+(12, '100', '100', '20', '20', 6, 6, '', '', 3);
 
 -- --------------------------------------------------------
 
@@ -135,11 +136,7 @@ INSERT INTO `messages` (`id`, `user`, `message`, `date_sent`, `guild_id`) VALUES
 (7, '11', 'I\'m from this guild! Galaxy conquerors', '2024-01-11 08:24:10', 3),
 (8, '12', 'I\'m Most Strongest Potato hello!', '2024-01-11 08:46:50', 3),
 (9, '12', 'Sending messages test!!!', '2024-01-11 20:53:08', 3),
-(13, '12', 'Some message2', '2024-01-11 21:03:41', 3),
-(21, '11', 'awdawdad', '2024-01-11 21:25:56', 3),
-(33, '11', 'asdads', '2024-01-11 21:40:12', 3),
-(34, '11', 'Input test', '2024-01-11 21:40:24', 3),
-(35, '12', 'Hello Qwe!', '2024-01-11 21:42:45', 3);
+(104, '11', 'Hello world, no socket rooms yet! :[', '2024-01-12 18:48:51', 3);
 
 -- --------------------------------------------------------
 
@@ -238,7 +235,7 @@ ALTER TABLE `invitations`
 -- AUTO_INCREMENT for table `messages`
 --
 ALTER TABLE `messages`
-  MODIFY `id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=119;
 
 --
 -- AUTO_INCREMENT for table `users`
