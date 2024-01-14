@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 15, 2024 at 12:22 AM
+-- Generation Time: Jan 15, 2024 at 12:25 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -49,7 +49,7 @@ CREATE TABLE `game` (
 
 INSERT INTO `game` (`id`, `gold`, `diamonds`, `currentlevel`, `maxlevel`, `currentstage`, `maxstage`, `currenthp`, `maxhp`, `currentdamage`, `totaldamage`, `critchance`, `guild_id`) VALUES
 (10, '420', '999', '1', '1', 9, 0, '', '', '', '', '', 0),
-(11, '629284103', '214', '81', '81', 9, 9, '19683', '19683', '9477', '1337', '0.1', 3),
+(11, '100', '100', '1', '1', 0, 0, '10', '10', '1', '1', '0.1', 3),
 (12, '100', '100', '21', '21', 6, 6, '1323', '1323', '100', '100', '0.01', 3);
 
 -- --------------------------------------------------------
@@ -279,9 +279,9 @@ CREATE TABLE `users_items` (
 --
 
 INSERT INTO `users_items` (`id`, `user_id`, `item_id`, `level`, `cost`, `damage`, `locked`) VALUES
-(1, 11, 1, '67', '2628', '138', 0),
-(2, 11, 2, '19', '2526', '302', 0),
-(3, 11, 3, '7', '35177', '748', 1),
+(1, 11, 1, '0', '100', '1', 0),
+(2, 11, 2, '0', '1000', '10', 0),
+(3, 11, 3, '0', '2500', '100', 1),
 (4, 12, 1, '1', '100', '1', 0),
 (5, 12, 2, '0', '500', '1', 1),
 (6, 12, 3, '0', '2500', '1', 1);
