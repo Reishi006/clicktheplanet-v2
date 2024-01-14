@@ -20,7 +20,18 @@ let advance = true;
 let stageCount = 10;
 let reset = false;
 
+let isCritical = false;
+let crit = 0;
+
+let spin = 0;
+
 let arrowQuery = 'UPDATE game JOIN users ON game.id = users.game_id SET currentlevel = ?, currentstage = ?, currenthp = ?, maxHp = ? WHERE users.id = ?';
+let itemQuery = `UPDATE users_items ut
+JOIN users u ON ut.user_id = u.id
+JOIN game ga ON u.game_id = ga.id
+SET ut.level = ?, ut.cost = ?, ut.damage = ?, ga.currentdamage = ?
+WHERE u.id = ? AND ut.item_id = ?`;
+let diamondsQuery = `UPDATE game JOIN users ON game.id = users.game_id SET diamonds = ? WHERE users.id = ?`;
 
 const calculatePlanet = () => {
     if (gameState.planet.currentLevel == 1) {
@@ -81,10 +92,41 @@ const advancePlanet = () => {
     }
 }
 
+const earnGold = () => {
+    gameState.player.gold = gameState.player.gold + gameState.planet.goldReward;
+    db.query('UPDATE game JOIN users ON game.id = users.game_id SET gold = ? WHERE users.id = ?', [gameState.player.gold, userId], (err, data) => {
+        if (err) throw err;
+        console.log('%c gold updated', 'color: yellow');
+    });
+}
+
+const calculateCritChance = () => {
+    let random = Math.random();
+
+    if (random <= gameState.player.critChance) {
+        return isCritical = true;
+    } else {
+        return isCritical = false;
+    }
+}
+
+const calculateCritDamage = () => {
+    let dmg = 5 * gameState.player.currentDamage;
+    crit = dmg;
+    console.log(`critical! ${dmg}`);
+    return dmg;
+}
+
 const hitPlanet = () => {
-    gameState.planet.currentHp -= gameState.player.currentDamage;
+    calculateCritChance();
+    if (isCritical == true) {
+        gameState.planet.currentHp -= calculateCritDamage();
+    } else if (isCritical == false) {
+        gameState.planet.currentHp -= gameState.player.currentDamage;   
+    }
     if (gameState.planet.currentHp <= 0) {
         calculatePlanet();
+        earnGold();
         reset = true;
         if (advance) advancePlanet();
     } else {
@@ -99,7 +141,16 @@ const arrowLeft = () => {
             gameState.planet.currentLevel -= 1;
             calculatePlanet();
             gameState.planet.currentStage = stageCount;
+            console.log(`arrowGold: ${gameState.planet.goldReward}`);
 
+            db.query(arrowQuery, 
+            [gameState.planet.currentLevel, gameState.planet.currentStage, gameState.planet.currentHp, gameState.planet.maxHp, userId], (err, data) => {
+                if (err) throw err;
+                console.log('%c levels updated', 'color: lightgreen');
+            });
+        } else if (gameState.planet.currentLevel == 1) {
+            calculatePlanet();
+            gameState.planet.currentStage = stageCount;
             db.query(arrowQuery, 
             [gameState.planet.currentLevel, gameState.planet.currentStage, gameState.planet.currentHp, gameState.planet.maxHp, userId], (err, data) => {
                 if (err) throw err;
@@ -140,6 +191,37 @@ const arrowRight = () => {
     }
 }
 
+const buyItem = (name, id) => {
+    if (gameState.player.gold >= gameState['items'][name]['cost']) {
+        gameState.player.gold -= gameState['items'][name]['cost'];
+        gameState['items'][name]['level'] += 1;
+        gameState['items'][name]['cost'] = Math.floor((gameState['items'][name]['baseCost']) * 1.05**(gameState['items'][name]['level']));
+        gameState['items'][name]['damage'] = Math.floor(gameState['items'][name]['damage'] + (gameState['items'][name]['baseDamage'] * 1.05**gameState['items'][name]['level']));
+        gameState.player.currentDamage += gameState['items'][name]['damage'];
+        console.log(gameState['items'][name]);
+
+        db.query(itemQuery, 
+        [
+            gameState['items'][name]['level'], 
+            gameState['items'][name]['cost'], 
+            gameState['items'][name]['damage'], 
+            gameState.player.currentDamage,
+            userId,
+            id
+        ],
+            (err, data) => {
+                if (err) throw err;
+            });
+        }
+}
+
+const setDiamonds = () => {
+    gameState.player.diamonds += 1;
+    db.query(diamondsQuery, [gameState.player.diamonds, userId], (err, data) => {
+        if (err) throw err;
+    });
+}
+
 const getMessage = (mess, uid, socket) => {
     const getLastMessage = `SELECT m.*, u.login
     FROM messages AS m
@@ -154,10 +236,10 @@ const getMessage = (mess, uid, socket) => {
     db.query(getLastMessage, [mess, uid], (err, data) => {
         if (err) throw err;
         const messageData = data[0];
-        /* console.log('mess:', mess);
-        console.log('uid:', uid);
         console.log('data:', data);
-        console.log(`messageData.id ${messageData.id}`) */
+        console.log(`messageData.id ${messageData.id}`);
+        console.log(messageData.guild_id);
+        socket.join(messageData.guild_id);
         socket.emit('receiveinputsubmit', {
             id: messageData.id,
             login: messageData.login,
@@ -206,19 +288,26 @@ module.exports = {
             getGuild(userId); */
             
             //socket.to(roomId).emit('receive_setall', gameState);
-            calculatePlanet();
-            socket.emit('receiveload', {gameState: gameState});
+            
 
-
-            socket.on('load', (data) => {
-                calculatePlanet();
-                console.log(`load data: ${data}`);
-                socket.emit('receiveload', {gameState: gameState})
-            });
+            socket.on('openchat', () => {
+                let guildId = 0;
+                db.query(`SELECT ga.guild_id FROM game ga 
+                JOIN guilds g ON ga.guild_id = g.id 
+                JOIN users u ON u.game_id = ga.id
+                WHERE u.id = ?`
+                , [userId], (err, data) => {
+                    guildId = data[0].guild_id;
+                    console.log(`guildId: ${guildId}`);
+                    socket.join(guildId);
+                    
+                    socket.to(guildId).emit('receivechat', {currentHp: gameState.planet.currentHp});
+                });
+            })
 
             socket.on('sendclick', () => {
                 hitPlanet();
-                socket.emit('receiveclick', {gameState: gameState, reset: reset});
+                socket.emit('receiveclick', {gameState: gameState, reset: reset, isCritical: isCritical, crit: crit});
             });
 
             socket.on('arrowleft', () => {
@@ -241,13 +330,34 @@ module.exports = {
                 socket.emit('receivearrowright', {gameState: gameState});
             });
 
-            socket.on('inputsubmit', (input) => {
+            socket.on('buyitem', (data) => {
+                console.log(`buyitem data: ${data.id}`);
 
+                buyItem(data.name, data.id);
+
+                socket.emit('receivebuyitem', {gameState: gameState, name: data.name});
+            });
+
+            socket.on('spin', () => {
+                spin =  Math.floor(Math.random()*360*10);
+
+                socket.emit('receivespin', {spin: spin});
+            });
+
+            socket.on('diamonds', () => {
+                setDiamonds();
+                socket.emit('receivediamonds', {gameState: gameState});
+                console.log(`diamonds sent`);
+            })
+
+            socket.on('inputsubmit', (data) => {
                 /* ===== TO BE FIXED ===== */
+                console.log(`input: ${data.input} ${data.id}`);
                 
-                getMessage(input, userId, socket);
-                console.log(`input: ${input}`);
-                //socket.emit('receiveinputsubmit', getMessage(input, userId));
+                getMessage(data.input, data.id, socket);
+                
+                //socket.emit('receiveinputsubmit', );
+                
             });
         });
 

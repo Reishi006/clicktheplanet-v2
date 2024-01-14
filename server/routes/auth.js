@@ -20,6 +20,10 @@ FROM users u
 JOIN game g ON u.game_id = g.id
 JOIN guilds gd ON g.guild_id = gd.id
 WHERE u.id = ?`;
+const fetchNotifications = `SELECT DISTINCT i.id, i.user_id, i.guild_id, g.name FROM invitations i
+JOIN guilds g ON i.guild_id = g.id
+WHERE i.user_id = ?`;
+const deleteNotification = `DELETE FROM invitations WHERE user_id = ? AND guild_id = ?`;
 
 global.userId = null;
 
@@ -60,7 +64,12 @@ const checkAuth = (req, res, next) => {
     next();
 } */
 
-let queryAll = 'SELECT * FROM users JOIN game ON game.id = users.game_id JOIN guilds ON guilds.id = game.guild_id WHERE users.id = ?';
+let queryAll = `SELECT * FROM users 
+JOIN users_items ON users_items.user_id = users.id
+JOIN items ON users_items.item_id = items.id
+JOIN game ON game.id = users.game_id 
+JOIN guilds ON guilds.id = game.guild_id 
+WHERE users.id = ?`;
 
 const initialFetch = (playerid, res) => {
     db.query(queryAll/* 'SELECT * FROM game JOIN users ON game.id = users.game_id WHERE users.id = ?' */, playerid, (err, data) => {
@@ -73,6 +82,8 @@ const initialFetch = (playerid, res) => {
         //gameState.player.critChance
         gameState.player.currentDamage = Number(data[0].currentdamage);
         gameState.player.totalDamage = Number(data[0].totaldamage);
+        gameState.player.critChance = Number(data[0].critchance);
+        console.log(`critChance: ${gameState.player.critChance}`);
 
 
         gameState.planet.currentLevel = Number(data[0].currentlevel);
@@ -82,9 +93,21 @@ const initialFetch = (playerid, res) => {
 
         gameState.planet.maxHp = data[0].maxhp;
         gameState.planet.currentHp = gameState.planet.maxHp;
-        
         //set hp onload to prevent the object defaults
 
+
+        gameState.items.blueLaserGun.level = Number(data[0].level);
+        gameState.items.blueLaserGun.cost = Number(data[0].cost);
+        gameState.items.blueLaserGun.damage = Number(data[0].damage);
+        gameState.items.blueLaserGun.damage = data[0].locked;
+        gameState.items.greenLaserGun.level = Number(data[1].level);
+        gameState.items.greenLaserGun.cost = Number(data[1].cost);
+        gameState.items.greenLaserGun.damage = Number(data[1].damage);
+        gameState.items.blueLaserGun.damage = data[1].locked;
+        gameState.items.redLaserGun.level = Number(data[2].level);
+        gameState.items.redLaserGun.cost = Number(data[2].cost);
+        gameState.items.redLaserGun.damage = Number(data[2].damage);
+        gameState.items.blueLaserGun.damage = data[2].locked;
 
         console.log(`initialFetch: maxStage: ${gameState.planet.maxStage}`);
         console.log(`initialFetch: currentStage: ${gameState.planet.currentStage}`);
@@ -96,6 +119,7 @@ const initialFetch = (playerid, res) => {
 
             currentdamage: data[0].currentdamage,
             totaldamage: data[0].totaldamage,
+            critchance: data[0].critchance,
 
             currentlevel: data[0].currentlevel,
             maxlevel: data[0].maxlevel,
@@ -104,6 +128,25 @@ const initialFetch = (playerid, res) => {
 
             currenthp: data[0].maxhp,
             maxhp: data[0].maxhp,
+
+            bluelasergun: {
+                level: data[0].level,
+                cost: data[0].cost,
+                damage: data[0].damage,
+                locked: data[0].locked,
+            },
+            greenlasergun: {
+                level: data[1].level,
+                cost: data[1].cost,
+                damage: data[1].damage,
+                locked: data[1].locked,
+            },
+            redlasergun: {
+                level: data[2].level,
+                cost: data[2].cost,
+                damage: data[2].damage,
+                locked: data[2].locked,
+            },
         });
     });
 }
@@ -217,7 +260,7 @@ router.get('/mainadmin', checkAuth, /* checkAdmin, */ (req, res) => {
     initialFetch(req.id, res);
 })
 
-router.get('/guild', (req, res) => {
+router.get('/guild', checkAuth, (req, res) => {
     db.query(getMessages, (err, data) => {
         if (err) throw err;
         //console.log(data);
@@ -225,15 +268,36 @@ router.get('/guild', (req, res) => {
     });
 });
 
-router.post('/guild', (req, res) => {
-    console.log(`guild_send userId: ${userId} ${req.body.input}`);
-    db.query(sendMessage, [req.body.input, userId], (err, data) => {
+router.post('/guild', checkAuth, (req, res) => {
+    console.log(`guild_send userId: ${req.id} ${req.body.input}`);
+    db.query(sendMessage, [req.body.input, req.id], (err, data) => {
+        if (err) throw err;
+        console.log(data);
+    });
+    db.query('SELECT * FROM messages WHERE message = ? AND user = ?', [req.body.input, req.id], (err, data) => {
+        if (err) throw err;
+        console.log(`read data from guild insert: ${data[0].user} + reqid ${req.id}`);
+        res.send(data);
+    });
+});
+
+router.get('/notifications', checkAuth, (req, res) => {
+    console.log(`notifications_send userId: ${userId}`);
+    db.query(fetchNotifications, [req.id], (err, data) => {
+        if (err) throw err;
+        console.log(data);
+        res.send(data);
+    });
+})
+
+router.post('/notifications', checkAuth, (req, res) => {
+    console.log(`notif delete: ${req.id} ${req.body.guild_id}`)
+    db.query(deleteNotification, [req.id, req.body.guild_id], (err, data) => {
         if (err) throw err;
         console.log(data);
         res.send(data);
     });
 });
-
 
 router.post('/logout', (req, res) => {
     res.clearCookie("access_token",{
