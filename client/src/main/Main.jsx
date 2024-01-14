@@ -20,6 +20,7 @@ import Wheel from '../components/Wheel';
 import Planet from '../components/Planet';
 import Drawer from '../components/Drawer';
 import Settings from '../components/Settings';
+import Notifications from '../components/Notifications';
 import extractStatus from '../auth/Register';
 //import { getRandomColor, handlePlanet, handleArrowLeft, handleArrowRight } from '../functions/GameFunctions';
 import { useState, useEffect, useRef } from 'react';
@@ -40,6 +41,7 @@ function Main() {
   const [show, setShow] = useState(0);
   const [display, setDisplay] = useState({
     settings: false,
+    notifications: false,
   });
   const [coords, setCoords] = useState({x: 0, y: 0});
   const [randomPlanet, setPlanet] = useState();
@@ -53,6 +55,9 @@ function Main() {
     currentDamage: 1,
     critChance: 0.1,
     totalDamage: 0,
+
+    crit: 0,
+    isCritical: false,
   });
   const [planetState, setPlanetState] = useState({
     currentHp: 100,
@@ -65,11 +70,54 @@ function Main() {
 
     reset: false,
   });
+  const [itemState, setItemsState] = useState({
+    blueLaserGun: {
+      level: 0,
+      cost: 0,
+      damage: 0,
+      locked: false,
+    },
+    greenLaserGun: {
+      level: 0,
+      cost: 0,
+      damage: 0,
+      locked: true,
+    },
+    redLaserGun: {
+      level: 0,
+      cost: 0,
+      damage: 0,
+      locked: true,
+    },
+    purpleLaserGun: {
+      level: 0,
+      cost: 0,
+      damage: 0,
+      locked: true,
+    },
+  });
+
+  const [position, setPosition] = useState({ top: 0, left: 0 }); //diamond position;
+  const [visible, setVisible] = useState(true);
+  const timerRef = useRef();
 
   const [planetScale, setPlanetScale] = useState(0.5);
 
-  
-  const options = [<Store/>, <Ship/>, <Stats playerState={playerState} planetState={planetState}/>, <Guild/>, <Wheel/>];
+  const [spin, setSpin] = useState(0);
+  const [isClicked, setIsClicked] = useState(false);
+
+  /* const [isChecked, setIsChecked] = useState({
+    option1: false,
+    option2: false,
+    option3: false,
+  }); */
+
+  const openChat = () => {
+    socket.emit('openchat', 'i want chat opened');
+    socket.once('receivechat', (data) => {
+      console.log(data);
+    });
+  }
 
   const planets = [planet1, planet2, planet3, planet4, planet5];
   const planetsBosses = [planetboss1, planetboss2, planetboss3, planetboss4, planetboss5];
@@ -86,6 +134,7 @@ function Main() {
     'Inhabited planet', 'White dwarf', 'Red dwarf', 'Black Hole'
   ];
 
+  
 
   let planet = Math.floor(Math.random() * 5);
   let hueRotate = Math.floor(Math.random() * 359);
@@ -97,6 +146,56 @@ function Main() {
       {r: 75, g: 40, b: 111}, 
       {r: 90, g: 37, b: 37},
   ];
+
+
+  const handleDiamond = () => {
+    setVisible(false);
+
+    socket.emit('diamonds', 'clicked');
+
+    socket.on('receivediamonds', (data) => {
+      setPlayerState({...playerState,
+        diamonds: data.gameState.player.diamonds,
+      });
+    });
+  
+    // Generate random times
+    const maxTime = 20000; // Maximum time in milliseconds
+    const time = Math.floor(Math.random() * maxTime) + 10000;
+  
+    // Schedule the object to appear again
+    timerRef.current = setTimeout(() => {
+      setVisible(true);
+      moveObject();
+    }, time);
+
+    console.log(`diamonds retrieved`);
+   };
+
+   const moveObject = () => {
+    // Generate random positions
+    const maxLeft = window.innerWidth - 100; // Assuming the object is 100px wide
+    const maxTop = window.innerHeight - 100; // Assuming the object is 100px tall
+    const leftPos = Math.floor(Math.random() * (maxLeft + 1));
+    const topPos = Math.floor(Math.random() * (maxTop + 1));
+   
+    // Update the state with the new position
+    setPosition({ top: topPos, left: leftPos });
+    };
+   
+    useEffect(() => {
+    setVisible(false);
+    // Move the object immediately when the component mounts
+    const maxTime = 10000;
+    const time = Math.floor(Math.random() * maxTime) + 10000;
+    setTimeout(() => {
+      setVisible(true);
+    }, time);
+    moveObject();
+   
+    // Clean up on unmount
+    return () => clearTimeout(timerRef.current);
+    }, []);
 
   function getRandomColor(planet) {
       /* const r = Math.floor(Math.random() * planetsColor[planet].r) + (planetsColor[planet].r - 20);
@@ -134,9 +233,13 @@ function Main() {
     if (!damageDisplayRef.current) return;
 
     const newDamageDisplay = document.createElement('div');
-    newDamageDisplay.textContent = `-${playerState.currentDamage}hp`;
-    newDamageDisplay.className = 'planet-damage-display';
-
+    if (planetState.isCritical === false) {
+      newDamageDisplay.textContent = `-${playerState.currentDamage}hp`;
+      newDamageDisplay.className = 'planet-damage-display';
+    } else if (planetState.isCritical === true) {
+      newDamageDisplay.textContent = `-${planetState.crit}hp`;
+      newDamageDisplay.className = 'planet-critdamage-display';
+    }
     const planetPosition = damageDisplayRef.current.getBoundingClientRect();
     const randomX = Math.random() * planetPosition.width;
     const randomY = Math.random() * planetPosition.height;
@@ -208,11 +311,15 @@ function Main() {
           maxLevel: data.gameState.planet.maxLevel,
           currentStage: data.gameState.planet.currentStage,
           maxStage: data.gameState.planet.maxStage,
+
           reset: data.reset,
+          crit: data.crit,
+          isCritical: data.isCritical,
         });
 
 
         setPlayerState(playerState => ({...playerState,
+          gold: data.gameState.player.gold,
           currentDamage: data.gameState.player.currentDamage,
         }));
       });
@@ -275,6 +382,50 @@ function Main() {
       if (planetState.currentLevel !== planetState.maxLevel) resetPlanet(1, false);
   }
 
+  const buyItem = (name, id) => {
+    console.log(`buyitem ${name}`);
+    socket.emit('buyitem', {name, id});
+
+    socket.once('receivebuyitem', function(data) {
+      setPlayerState({...playerState,
+        gold: data.gameState.player.gold,
+        currentDamage: data.gameState.player.currentDamage,
+      });
+      setItemsState({...itemState,
+        [data.name]: {
+          level: data['gameState']['items'][data.name]['level'],
+          cost: data['gameState']['items'][data.name]['cost'],
+          damage: data['gameState']['items'][data.name]['damage'],
+        },
+      })
+    });
+  }
+
+  const handleSpin = () => {
+    setSpin(0);
+    setIsClicked(true);
+
+    if (spin === 0) {
+      setTimeout(() => {
+        setIsClicked(false);
+        console.log(spin);
+
+        socket.emit('spin', 'spun');
+
+        socket.once('receivespin', (data) => {
+          console.log(data.spin);
+          setSpin(data.spin);
+        });
+      }, 0)
+    }
+    /* setTimeout(() => {
+      setSpin(0);
+    }, 5000); */
+  }
+
+  useEffect(() => {
+  }, [spin]);
+
   const getData = () => {
 
     socket.on('receiveload', (data) => {
@@ -295,6 +446,7 @@ function Main() {
 
         currentDamage: res.data.currentdamage,
         totalDamage: res.data.totaldamage,
+        critChance: res.data.critchance,
       }));
       setPlanetState(planetState => ({...planetState, 
         currentLevel: res.data.currentlevel, 
@@ -305,6 +457,26 @@ function Main() {
         currentHp: res.data.currenthp,
         maxHp: res.data.maxhp,
       }));
+      setItemsState({...itemState,
+        blueLaserGun: {
+          level: res.data.bluelasergun.level,
+          cost: res.data.bluelasergun.cost,
+          damage: res.data.bluelasergun.damage,
+          locked: res.data.bluelasergun.locked,
+        },
+        greenLaserGun: {
+          level: res.data.greenlasergun.level,
+          cost: res.data.greenlasergun.cost,
+          damage: res.data.greenlasergun.damage,
+          locked: res.data.greenlasergun.locked,
+        },
+        redLaserGun: {
+          level: res.data.redlasergun.level,
+          cost: res.data.redlasergun.cost,
+          damage: res.data.redlasergun.damage,
+          locked: res.data.redlasergun.locked,
+        },
+      });
 
       const newSocket = io(`http://localhost:8000`);
       setSocket(newSocket);
@@ -352,12 +524,30 @@ function Main() {
         settings: true,
       }));
     }
-    
   }
+
+  const toggleNotifications = () => {
+    if (display.notifications === true) {
+      setDisplay(display => ({...display,
+        notifications: false,
+      }));
+    } else {
+      setDisplay(display => ({...display,
+        notifications: true,
+      }));
+    }
+  }
+  const options = [<Store itemState={itemState} buyItem={buyItem}/>, 
+  <Ship/>, 
+  <Stats playerState={playerState} planetState={planetState}/>, 
+  <Guild/>, 
+  <Wheel handleSpin={handleSpin} spin={spin}/>];
 
   return (
     <>
       <div className='game-container'>
+
+        {visible && <img onClick={handleDiamond} className='click-diamond' style={{ top: `${position.top}px`, left: `${position.left}px` }} src={diamond}></img>}
 
         <div className='navbar-container'>
           <div className='navbar-left'>
@@ -369,8 +559,9 @@ function Main() {
               <img className='navbar-profile-logo' src={user_prof1} alt='user-logo'></img>
             </div>
             <div className='navbar-bell-container'>
-              <img className='navbar-bell' src={bell} alt='notifications'></img>
+              <img className='navbar-bell' onClick={toggleNotifications} src={bell} alt='notifications'></img>
               <div className='navbar-bell-notification'>1</div>
+              {display.notifications && <Notifications toggleNotifications={toggleNotifications}></Notifications>}
             </div>
             <img src={settings} onClick={toggleSettings} alt='settings'></img>
             <form method='post' onSubmit={handleLogout}><button type='submit' name='submit'>Logout</button></form>
@@ -388,7 +579,7 @@ function Main() {
 
           <div className='main-left'>
 
-              <Drawer setShow={setShow}></Drawer>
+              <Drawer openChat={openChat} setShow={setShow}></Drawer>
 
               <div className='main-content-container'>
                 <div className='money-display'>

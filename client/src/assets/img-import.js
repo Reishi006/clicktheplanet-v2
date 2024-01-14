@@ -5,6 +5,7 @@ import diamond from '../assets/env/smaller_diamond.png';
 import bell from '../assets/env/bell.svg';
 import settings from '../assets/env/settings.svg';
 import x from '../assets/env/x.svg';
+import tick from '../assets/env/tick.svg';
 import user_prof1 from '../assets/profile/user_prof1.svg';
 import user_prof2 from '../assets/profile/user_prof2.svg';
 import user_prof3 from '../assets/profile/user_prof3.svg';
@@ -47,7 +48,7 @@ import skipArrowRight from '../assets/env/skip-arrow-right.svg';
 export {
     logo, scaled_logo,
     gold, diamond,
-    bell, settings, x,
+    bell, settings, x, tick,
     user_prof1, user_prof2, user_prof3, user_prof4, user_prof5,
     planet1, planet2, planet3, planet4, planet5,
     planetboss1, planetboss2, planetboss3, planetboss4, planetboss5,

@@ -18,7 +18,7 @@ export default function Stats({ playerState, planetState }) {
                     </div>
                     <div className='stats-item'>
                         <div>Critical hit chance:</div>
-                        <div>{`${playerState.critChance*10}%`}</div>
+                        <div>{`${playerState.critChance*100}%`}</div>
                     </div>
                     <div className='stats-item'>
                         <div>Total damage dealt:</div>

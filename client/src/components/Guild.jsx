@@ -28,11 +28,12 @@ export default function Guild() {
         try {
             if (input !== '') {
                 const res = await axios.post('/routes/guild', {input});
-                console.log(res.data);
+                console.log(res.data[0].user);
                 console.log('Guilds: message sent'+ input);
 
 
-                socket.emit('inputsubmit', input);
+                socket.emit('inputsubmit', {input: input, id: res.data[0].user});
+                console.log(res.data[0].user);
                 
                 socket.once('receiveinputsubmit', function(data) {
 
@@ -46,6 +47,7 @@ export default function Guild() {
             setInput('');
         } catch (err) {
             setErrData(err);
+            console.log(err);
         }
     }
 
@@ -83,7 +85,7 @@ export default function Guild() {
                 <div className='title'>Guild</div>
                 <div className='guild-container'>
                     <div className='guild-chat' ref={messagesEndRef}>
-                        {messages && messages.map((row) => {
+                        {Array.isArray(messages) && messages.map((row) => {
 
                             const date = new Date(row.date_sent);
                             const day = String(date.getDate()).padStart(2, '0');
@@ -93,6 +95,7 @@ export default function Guild() {
                             const minutes = String(date.getMinutes()).padStart(2, '0');
                         
                             const formattedDate = `${day}.${month}.${year} - ${hours}:${minutes}`;
+
 
                             return (
                                 <div className='guild-message' key={row.id}>
