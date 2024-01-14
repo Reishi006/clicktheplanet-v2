@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 14, 2024 at 09:17 PM
+-- Generation Time: Jan 15, 2024 at 12:22 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -49,7 +49,7 @@ CREATE TABLE `game` (
 
 INSERT INTO `game` (`id`, `gold`, `diamonds`, `currentlevel`, `maxlevel`, `currentstage`, `maxstage`, `currenthp`, `maxhp`, `currentdamage`, `totaldamage`, `critchance`, `guild_id`) VALUES
 (10, '420', '999', '1', '1', 9, 0, '', '', '', '', '', 0),
-(11, '56262429', '202', '68', '68', 0, 0, '13872', '13872', '9477', '1337', '0.1', 3),
+(11, '629284103', '214', '81', '81', 9, 9, '19683', '19683', '9477', '1337', '0.1', 3),
 (12, '100', '100', '21', '21', 6, 6, '1323', '1323', '100', '100', '0.01', 3);
 
 -- --------------------------------------------------------
@@ -110,7 +110,8 @@ CREATE TABLE `invitations` (
 --
 
 INSERT INTO `invitations` (`id`, `guild_id`, `user_id`) VALUES
-(6, 4, 12);
+(6, 4, 12),
+(8, 4, 11);
 
 -- --------------------------------------------------------
 
@@ -364,7 +365,7 @@ ALTER TABLE `guild_members`
 -- AUTO_INCREMENT for table `invitations`
 --
 ALTER TABLE `invitations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `items`
