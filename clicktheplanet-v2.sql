@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 13, 2024 at 09:14 PM
+-- Generation Time: Jan 14, 2024 at 09:17 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -39,6 +39,7 @@ CREATE TABLE `game` (
   `maxhp` varchar(50) NOT NULL,
   `currentdamage` varchar(50) NOT NULL,
   `totaldamage` varchar(50) NOT NULL,
+  `critchance` varchar(10) NOT NULL,
   `guild_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -46,10 +47,10 @@ CREATE TABLE `game` (
 -- Dumping data for table `game`
 --
 
-INSERT INTO `game` (`id`, `gold`, `diamonds`, `currentlevel`, `maxlevel`, `currentstage`, `maxstage`, `currenthp`, `maxhp`, `currentdamage`, `totaldamage`, `guild_id`) VALUES
-(10, '420', '999', '1', '1', 9, 0, '', '', '', '', 0),
-(11, '2137', '120', '232', '232', 4, 4, '161472', '161472', '100000', '1337', 3),
-(12, '100', '100', '20', '20', 6, 6, '', '', '', '', 3);
+INSERT INTO `game` (`id`, `gold`, `diamonds`, `currentlevel`, `maxlevel`, `currentstage`, `maxstage`, `currenthp`, `maxhp`, `currentdamage`, `totaldamage`, `critchance`, `guild_id`) VALUES
+(10, '420', '999', '1', '1', 9, 0, '', '', '', '', '', 0),
+(11, '56262429', '202', '68', '68', 0, 0, '13872', '13872', '9477', '1337', '0.1', 3),
+(12, '100', '100', '21', '21', 6, 6, '1323', '1323', '100', '100', '0.01', 3);
 
 -- --------------------------------------------------------
 
@@ -89,7 +90,8 @@ CREATE TABLE `guild_members` (
 --
 
 INSERT INTO `guild_members` (`id`, `user_id`, `guild_id`) VALUES
-(3, 11, 3);
+(3, 11, 3),
+(4, 12, 3);
 
 -- --------------------------------------------------------
 
@@ -108,7 +110,7 @@ CREATE TABLE `invitations` (
 --
 
 INSERT INTO `invitations` (`id`, `guild_id`, `user_id`) VALUES
-(1, 3, 12);
+(6, 4, 12);
 
 -- --------------------------------------------------------
 
@@ -158,7 +160,77 @@ INSERT INTO `messages` (`id`, `user`, `message`, `date_sent`, `guild_id`) VALUES
 (7, '11', 'I\'m from this guild! Galaxy conquerors', '2024-01-11 08:24:10', 3),
 (8, '12', 'I\'m Most Strongest Potato hello!', '2024-01-11 08:46:50', 3),
 (9, '12', 'Sending messages test!!!', '2024-01-11 20:53:08', 3),
-(104, '11', 'Hello world, no socket rooms yet! :[', '2024-01-12 18:48:51', 3);
+(104, '11', 'Hello world, no socket rooms yet! :[', '2024-01-12 18:48:51', 3),
+(119, '11', 'Welcome to the guild!', '2024-01-14 10:02:22', 3),
+(120, '11', 'Hello!!!', '2024-01-14 10:21:34', 3),
+(121, '11', 'fdsfdsfsfs', '2024-01-14 10:21:37', 3),
+(122, '11', 'dsadasda', '2024-01-14 10:37:34', 3),
+(123, '12', 'dadada', '2024-01-14 10:45:11', 3),
+(124, '11', 'Hello', '2024-01-14 10:56:19', 3),
+(125, '11', 'Hello', '2024-01-14 10:56:49', 3),
+(126, '12', 'Hello', '2024-01-14 10:57:20', 3),
+(127, '12', 'dasda', '2024-01-14 10:59:07', 3),
+(128, '11', 'didada', '2024-01-14 11:02:35', 3),
+(129, '11', 'fsdfs', '2024-01-14 11:03:33', 3),
+(130, '11', 'dfsdf', '2024-01-14 11:03:56', 3),
+(131, '11', 'dsfdsf', '2024-01-14 11:04:37', 3),
+(132, '11', 'hello', '2024-01-14 11:05:18', 3),
+(133, '11', 'hello', '2024-01-14 11:07:15', 3),
+(134, '11', 'hello', '2024-01-14 11:07:54', 3),
+(135, '11', 'hello', '2024-01-14 11:08:30', 3),
+(136, '11', 'hello', '2024-01-14 11:08:43', 3),
+(137, '11', 'h89h78h', '2024-01-14 11:10:01', 3),
+(138, '11', 'asdasda', '2024-01-14 11:16:15', 3),
+(139, '11', 'sadasdada', '2024-01-14 11:16:52', 3),
+(140, '11', 'asda', '2024-01-14 11:19:54', 3),
+(141, '11', 'asdadsdadads', '2024-01-14 11:20:32', 3),
+(142, '11', 'insert', '2024-01-14 11:22:16', 3),
+(143, '11', 'insert2', '2024-01-14 11:22:45', 3),
+(144, '11', 'insert3', '2024-01-14 11:23:26', 3),
+(145, '11', 'insert44', '2024-01-14 11:23:58', 3),
+(146, '11', 'inset555', '2024-01-14 11:27:20', 3),
+(147, '11', 'awsdawdawda', '2024-01-14 11:28:14', 3),
+(148, '11', 'zxczxc', '2024-01-14 11:32:50', 3),
+(149, '11', 'asdasda', '2024-01-14 11:48:05', 3),
+(150, '11', 'asdadsad', '2024-01-14 11:48:32', 3),
+(151, '11', 'awdawd', '2024-01-14 11:50:52', 3),
+(152, '11', 'uid test', '2024-01-14 11:54:16', 3),
+(153, '11', 'uid test2', '2024-01-14 11:55:58', 3),
+(154, '11', 'uid test3', '2024-01-14 11:57:49', 3),
+(155, '11', 'uid test4', '2024-01-14 11:58:23', 3),
+(156, '11', 'uid test 5', '2024-01-14 11:59:55', 3),
+(157, '11', 'uid test6', '2024-01-14 12:00:15', 3),
+(158, '11', 'uid test7', '2024-01-14 12:00:37', 3),
+(159, '12', 'hello after tests', '2024-01-14 12:00:50', 3),
+(160, '12', 'hello', '2024-01-14 12:01:00', 3),
+(161, '12', 'adadad', '2024-01-14 12:03:43', 3),
+(162, '11', 'adadad', '2024-01-14 12:03:54', 3),
+(163, '11', 'asdad', '2024-01-14 12:06:04', 3),
+(164, '11', 'asdadadadadada', '2024-01-14 12:06:19', 3),
+(165, '12', 'asdasdsad', '2024-01-14 12:06:27', 3),
+(166, '11', 'asdsada', '2024-01-14 12:14:44', 3),
+(167, '12', 'asdasd', '2024-01-14 12:14:55', 3),
+(168, '12', 'Hello world', '2024-01-14 12:16:57', 3),
+(169, '11', 'fgfgdf', '2024-01-14 12:22:37', 3),
+(170, '11', 'asdasdasda', '2024-01-14 12:23:19', 3),
+(171, '11', 'asdasdadasdadwdaqwqe', '2024-01-14 12:24:11', 3),
+(172, '11', 'asdas', '2024-01-14 12:24:33', 3),
+(173, '11', 'asdasdadasda', '2024-01-14 12:24:46', 3),
+(174, '11', 'Hello', '2024-01-14 12:25:24', 3),
+(175, '11', 'Hello hello', '2024-01-14 12:26:46', 3),
+(176, '11', 'sdadsaa', '2024-01-14 12:42:40', 3),
+(177, '11', 'asdasd', '2024-01-14 12:43:10', 3),
+(178, '12', 'asdasda', '2024-01-14 12:43:18', 3),
+(179, '12', 'asdasdasdaddada', '2024-01-14 12:43:33', 3),
+(180, '12', 'sdadsad', '2024-01-14 12:44:05', 3),
+(181, '12', 'asdadasas', '2024-01-14 12:44:07', 3),
+(182, '11', 'dsdfdsfsf', '2024-01-14 12:46:12', 3),
+(183, '11', 'asdadsd', '2024-01-14 12:47:53', 3),
+(184, '11', 'asdasda', '2024-01-14 12:47:56', 3),
+(185, '12', 'asdasdada', '2024-01-14 12:48:06', 3),
+(186, '11', 'ddfdasfsdfs', '2024-01-14 12:51:22', 3),
+(187, '11', 'Dawdadwaaw', '2024-01-14 12:53:13', 3),
+(188, '11', 'dfsefsd', '2024-01-14 17:43:14', 3);
 
 -- --------------------------------------------------------
 
@@ -172,6 +244,7 @@ CREATE TABLE `users` (
   `login` varchar(30) NOT NULL,
   `password` varchar(255) NOT NULL,
   `admin` tinyint(1) NOT NULL,
+  `redeemed` tinyint(1) NOT NULL,
   `game_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -179,10 +252,10 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `email`, `login`, `password`, `admin`, `game_id`) VALUES
-(10, 'hello@mail.com', 'Hello', '$2a$10$0WrhDWNoA2IQL6J7aGOA2O3uYkz9Tc/eEjXjjumMtvhcGb.KIrBRW', 1, 10),
-(11, 'qwe@mail.com', 'Qwe', '$2a$10$lINez2/4OXVjAVtY5Ajr/uw/S5vaIPGq.JCPq6Hki0SkmIbXSblRC', 0, 11),
-(12, 'moststrongestpotato@mail.com', 'MostStrongestPotato', '$2a$10$MSNS3Qq8/744On2MeolpTOyu6fvCnxIS3A8BNVMBNpJ8.i/koUEW.', 0, 12);
+INSERT INTO `users` (`id`, `email`, `login`, `password`, `admin`, `redeemed`, `game_id`) VALUES
+(10, 'hello@mail.com', 'Hello', '$2a$10$0WrhDWNoA2IQL6J7aGOA2O3uYkz9Tc/eEjXjjumMtvhcGb.KIrBRW', 1, 0, 10),
+(11, 'qwe@mail.com', 'Qwe', '$2a$10$lINez2/4OXVjAVtY5Ajr/uw/S5vaIPGq.JCPq6Hki0SkmIbXSblRC', 0, 0, 11),
+(12, 'moststrongestpotato@mail.com', 'MostStrongestPotato', '$2a$10$MSNS3Qq8/744On2MeolpTOyu6fvCnxIS3A8BNVMBNpJ8.i/koUEW.', 0, 0, 12);
 
 -- --------------------------------------------------------
 
@@ -205,9 +278,12 @@ CREATE TABLE `users_items` (
 --
 
 INSERT INTO `users_items` (`id`, `user_id`, `item_id`, `level`, `cost`, `damage`, `locked`) VALUES
-(1, 11, 1, '1', '100', '1', 0),
-(2, 11, 2, '1', '1000', '10', 0),
-(3, 11, 3, '0', '2500', '0', 1);
+(1, 11, 1, '67', '2628', '138', 0),
+(2, 11, 2, '19', '2526', '302', 0),
+(3, 11, 3, '7', '35177', '748', 1),
+(4, 12, 1, '1', '100', '1', 0),
+(5, 12, 2, '0', '500', '1', 1),
+(6, 12, 3, '0', '2500', '1', 1);
 
 --
 -- Indexes for dumped tables
@@ -282,13 +358,13 @@ ALTER TABLE `guilds`
 -- AUTO_INCREMENT for table `guild_members`
 --
 ALTER TABLE `guild_members`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `invitations`
 --
 ALTER TABLE `invitations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `items`
@@ -300,7 +376,7 @@ ALTER TABLE `items`
 -- AUTO_INCREMENT for table `messages`
 --
 ALTER TABLE `messages`
-  MODIFY `id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=119;
+  MODIFY `id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=189;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -312,7 +388,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `users_items`
 --
 ALTER TABLE `users_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
