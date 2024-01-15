@@ -1,9 +1,23 @@
 import '../App/App.css';
-import extractStatus from './Register';
+//import extractStatus from './Register';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 //const axios = require('axios');
+
+const extractStatus = (message) => {
+  let status = String(message).match(/\b\d{3}\b/);
+  if (String(status) === '404') {
+    status = 'User not found (404)';
+  } else if (String(status) === '409') {
+    status = 'User already exists (409)';
+  } else if (String(status) === '500') {
+    status = 'Internal server error (500)';
+  } else if (String(status) === '400') {
+    status = 'Wrong username or password (400)';
+  }
+  return status;
+}
 
 function Login() {
 
@@ -30,7 +44,7 @@ function Login() {
         
         navigate('../main');
     } catch (err) {
-        setErrData(`${extractStatus(err)}`);
+        setErrData(extractStatus(err.message));
     }
   }
 

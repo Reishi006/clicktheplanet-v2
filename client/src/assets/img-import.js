@@ -26,6 +26,7 @@ import ship from '../assets/drawer/ship.svg';
 import stats from '../assets/drawer/stats.svg';
 import guild from '../assets/drawer/guild.svg';
 import wheel from '../assets/drawer/wheel.svg';
+import admin from '../assets/drawer/admin.svg';
 import laserGunBlue from '../assets/store/laser-gun-blue.png';
 import laserGunGreen from '../assets/store/laser-gun-green.png';
 import laserGunRed from '../assets/store/laser-gun-red.png';
@@ -52,7 +53,7 @@ export {
     user_prof1, user_prof2, user_prof3, user_prof4, user_prof5,
     planet1, planet2, planet3, planet4, planet5,
     planetboss1, planetboss2, planetboss3, planetboss4, planetboss5,
-    store, ship, stats, guild, wheel,
+    store, ship, stats, guild, wheel, admin,
     laserGunBlue, laserGunGreen, laserGunRed,
     laserMinigunBlue, laserMinigunGreen, laserMinigunRed,
     laserShotgunBlue, laserShotgunGreen, laserShotgunRed,

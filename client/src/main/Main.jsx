@@ -401,9 +401,11 @@ function Main() {
     });
   }
 
-  const handleSpin = () => {
-    setSpin(0);
-    setIsClicked(true);
+  const handleSpin = (e) => {
+  
+  setIsClicked(true);
+  setSpin(0);
+    
 
     if (spin === 0) {
       setTimeout(() => {

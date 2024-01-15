@@ -11,6 +11,8 @@ export const extractStatus = (message) => {
     status = 'User already exists (409)';
   } else if (String(status) === '500') {
     status = 'Internal server error (500)';
+  } else if (String(status) === '400') {
+    status = 'Wrong username or password (400)';
   }
   return status;
 }
