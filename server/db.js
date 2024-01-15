@@ -5,6 +5,7 @@ const db = mysql.createConnection({
   user: 'root',
   password: '',
   database: 'clicktheplanet-v2',
+  multipleStatements: true,
 });
 
 module.exports = db;

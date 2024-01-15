@@ -6,7 +6,17 @@ const jwt = require('jsonwebtoken');
 const gameState = require('../game/gameStateObj.js');
 const router = express.Router();
 
-const registerQuery = `INSERT INTO users (email, login, password) VALUES (?)`;
+const insertGame = `INSERT INTO game 
+(id, user_id, gold, diamonds, currentlevel, maxlevel, currentstage, maxstage, currenthp, maxhp, currentdamage, totaldamage, critchance, guild_id) 
+SELECT NULL, MAX(id), '100', '100', '1', '1', '0', '0', '10', '10', '1', '0', '0.01', NULL FROM users`;
+const insertItems = `INSERT INTO users_items (id, user_id, item_id, level, cost, damage, locked) 
+VALUES (NULL, (SELECT MAX(id) FROM users), '1', '0', '100', '1', '0');
+INSERT INTO users_items (id, user_id, item_id, level, cost, damage, locked) 
+VALUES (NULL, (SELECT MAX(id) FROM users), '2', '0', '1000', '10', '1');
+INSERT INTO users_items (id, user_id, item_id, level, cost, damage, locked) 
+VALUES (NULL, (SELECT MAX(id) FROM users), '3', '0', '2500', '100', '1');`;
+const maxGameId = `SELECT MAX(id) AS last_id FROM game`;
+const registerQuery = `INSERT INTO users VALUES (NULL, ?, ?, ?, '0', '0')`;
 const loginQuery = `SELECT * FROM users WHERE login = ?`;
 const checkUser = `SELECT * FROM users WHERE email = ? OR login = ?`;
 const getMessages = `SELECT DISTINCT m.id, m.user, m.message, m.date_sent, m.guild_id, u.login 
@@ -65,14 +75,12 @@ const checkAuth = (req, res, next) => {
 } */
 
 let queryAll = `SELECT * FROM users 
-JOIN users_items ON users_items.user_id = users.id
-JOIN items ON users_items.item_id = items.id
-JOIN game ON game.id = users.game_id 
-JOIN guilds ON guilds.id = game.guild_id 
+JOIN game ON users.id = game.user_id
+JOIN users_items ON users.id = users_items.user_id
 WHERE users.id = ?`;
 
 const initialFetch = (playerid, res) => {
-    db.query(queryAll/* 'SELECT * FROM game JOIN users ON game.id = users.game_id WHERE users.id = ?' */, playerid, (err, data) => {
+    db.query(queryAll, playerid, (err, data) => {
         if (err) return res.status(500).json(err);
         //console.log(data[0].login);
 
@@ -163,9 +171,24 @@ const registerHandler = async (req, res) => {
 
         const values = [email, login, hash];
 
-        db.query(registerQuery, [values], (err, data) => {
+        db.query(`INSERT INTO users VALUES (NULL, ?, ?, ?, '0', '0')`, [email, login, hash], (err, data) => {
+            console.log(values);
             if (err) return res.status(500).json(err);
-            else return res.status(201).json('User has been created!');
+            //else return res.status(201).json('User has been created!');
+            console.log(`inside registerQuery`);
+
+            db.query(insertGame, (err, data) => {
+                if (err) return res.status(500).json(`gameInsert err: ${err}`);
+                //else return res.status(201).json('Game data inserted!');
+                console.log(`inside insertGame`);
+                
+                db.query(insertItems, (err, data) => {
+                    console.log(`inside insertItems`);
+                    if (err) return res.status(500).json(`gameInsert err: ${err}`);
+                    else return res.status(201).json('Game data inserted!');
+
+                });
+            });
         });
         console.log(`From React: ${values}`);
     });

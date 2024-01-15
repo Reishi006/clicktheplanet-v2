@@ -25,13 +25,13 @@ let crit = 0;
 
 let spin = 0;
 
-let arrowQuery = 'UPDATE game JOIN users ON game.id = users.game_id SET currentlevel = ?, currentstage = ?, currenthp = ?, maxHp = ? WHERE users.id = ?';
+let arrowQuery = 'UPDATE game JOIN users ON game.user_id = users.id SET currentlevel = ?, currentstage = ?, currenthp = ?, maxHp = ? WHERE users.id = ?';
 let itemQuery = `UPDATE users_items ut
 JOIN users u ON ut.user_id = u.id
-JOIN game ga ON u.game_id = ga.id
+JOIN game ga ON u.id = ga.user_id
 SET ut.level = ?, ut.cost = ?, ut.damage = ?, ga.currentdamage = ?
 WHERE u.id = ? AND ut.item_id = ?`;
-let diamondsQuery = `UPDATE game JOIN users ON game.id = users.game_id SET diamonds = ? WHERE users.id = ?`;
+let diamondsQuery = `UPDATE game JOIN users ON game.user_id = users.id SET diamonds = ? WHERE users.id = ?`;
 
 const calculatePlanet = () => {
     if (gameState.planet.currentLevel == 1) {
@@ -70,7 +70,7 @@ const advancePlanet = () => {
         
         if (gameState.planet.currentLevel >= gameState.planet.maxLevel) gameState.planet.maxLevel = gameState.planet.currentLevel;
 
-        db.query('UPDATE game JOIN users ON game.id = users.game_id SET currentlevel = ?, maxlevel = ?, currentstage = ?, maxstage = ?, currenthp = ?, maxhp = ? WHERE users.id = ?', 
+        db.query('UPDATE game JOIN users ON game.user_id = users.id SET currentlevel = ?, maxlevel = ?, currentstage = ?, maxstage = ?, currenthp = ?, maxhp = ? WHERE users.id = ?', 
         [
             gameState.planet.currentLevel, 
             gameState.planet.maxLevel, 
@@ -84,7 +84,7 @@ const advancePlanet = () => {
             console.log('%c levels updated', 'color: lightgreen');
         });
     } else {
-        db.query('UPDATE game JOIN users ON game.id = users.game_id SET currentstage = ?, maxstage = ? WHERE users.id = ?', 
+        db.query('UPDATE game JOIN users ON game.user_id = users.id SET currentstage = ?, maxstage = ? WHERE users.id = ?', 
         [gameState.planet.currentStage, gameState.planet.maxStage, userId], (err, data) => {
             if (err) throw err;
             console.log('%c stage updated', 'color: lightblue');
@@ -94,7 +94,7 @@ const advancePlanet = () => {
 
 const earnGold = () => {
     gameState.player.gold = gameState.player.gold + gameState.planet.goldReward;
-    db.query('UPDATE game JOIN users ON game.id = users.game_id SET gold = ? WHERE users.id = ?', [gameState.player.gold, userId], (err, data) => {
+    db.query('UPDATE game JOIN users ON game.user_id = users.id SET gold = ? WHERE users.id = ?', [gameState.player.gold, userId], (err, data) => {
         if (err) throw err;
         console.log('%c gold updated', 'color: yellow');
     });
@@ -250,6 +250,64 @@ const getMessage = (mess, uid, socket) => {
     });
 }
 
+const setAdminGold = (g) => {
+    gameState.player.gold = g;
+
+    db.query('UPDATE game JOIN users ON game.user_id = users.id SET gold = ? WHERE users.id = ?', [g, userId], (err, data) => {
+        if (err) throw err;
+    });
+}
+
+const setAdminDiamonds = (d) => {
+    gameState.player.diamonds = d;
+
+    db.query('UPDATE game JOIN users ON game.user_id = users.id SET diamonds = ? WHERE users.id = ?', [d, userId], (err, data) => {
+        if (err) throw err;
+    });
+}
+
+const setAdminLevel = (l) => {
+    gameState.planet.currentLevel = l;
+    if (gameState.planet.maxLevel < gameState.planet.currentLevel) gameState.planet.maxLevel = currentLevel;
+
+    db.query('UPDATE game JOIN users ON game.user_id = users.id SET currentlevel = ?, maxlevel = ? WHERE users.id = ?', 
+    [l, gameState.planet.maxLevel, userId], (err, data) => {
+        if (err) throw err;
+    });
+}
+
+const setAdminStage = (s) => {
+    if (s > 10 || s < 0) {
+        return;
+    } else {
+        gameState.planet.currentStage = s;
+        if (gameState.planet.maxLevel === gameState.planet.currentLevel) gameState.planet.maxStage = gameState.planet.currentStage;
+        if (gameState.planet.currentLevel % 10 === 0) {
+            stageCount = 1;
+        } else {
+            stageCount = 10;
+        }
+    }
+
+    db.query('UPDATE game JOIN users ON game.user_id = users.id SET currentstage = ?, maxstage = ? WHERE users.id = ?', 
+    [s, gameState.planet.maxStage, userId], (err, data) => {
+        if (err) throw err;
+    });
+}
+
+const setAdminCrit = (c) => {
+    if (c < 1 && c >= 0) gameState.player.critChance = c;
+    else return;
+
+    console.log(`c: ${c}`);
+
+    db.query(`UPDATE game JOIN users ON game.user_id = users.id SET critchance = ? WHERE users.id = ?`, 
+    [c, userId], (err, data) => {
+        if (err) throw err;
+    });
+}
+
+
 //let roomId = '';
 
 const getGuild = (uid) => {
@@ -290,7 +348,7 @@ module.exports = {
             //socket.to(roomId).emit('receive_setall', gameState);
             
 
-            socket.on('openchat', () => {
+            /* socket.on('openchat', () => {
                 let guildId = 0;
                 db.query(`SELECT ga.guild_id FROM game ga 
                 JOIN guilds g ON ga.guild_id = g.id 
@@ -303,7 +361,7 @@ module.exports = {
                     
                     socket.to(guildId).emit('receivechat', {currentHp: gameState.planet.currentHp});
                 });
-            })
+            }) */
 
             socket.on('sendclick', () => {
                 hitPlanet();
@@ -358,6 +416,33 @@ module.exports = {
                 
                 //socket.emit('receiveinputsubmit', );
                 
+            });
+
+            //ADMIN PANEL
+
+            socket.on('setgold', (gold) => {
+                setAdminGold(gold);
+                socket.emit('receivesetgold', {gameState: gameState});
+            });
+
+            socket.on('setdiamonds', (diamonds) => {
+                setAdminDiamonds(diamonds);
+                socket.emit('receivesetdiamonds', {gameState: gameState});
+            });
+
+            socket.on('setlevel', (level) => {
+                setAdminLevel(level);
+                socket.emit('receivesetlevel', {gameState: gameState});
+            });
+
+            socket.on('setstage', (stage) => {
+                setAdminStage(stage);
+                socket.emit('receivesetstage', {gameState: gameState});
+            });
+
+            socket.on('setcrit', (crit) => {
+                setAdminCrit(crit);
+                socket.emit('receivesetcrit', {gameState: gameState});
             });
         });
 
