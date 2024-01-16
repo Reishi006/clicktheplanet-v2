@@ -197,6 +197,25 @@ function Main() {
     return () => clearTimeout(timerRef.current);
     }, []);
 
+    const handleResize = () => {
+      // Generate random positions
+      const maxLeft = window.innerWidth - 100; // Assuming the object is 100px wide
+      const maxTop = window.innerHeight - 100; // Assuming the object is 100px tall
+      const leftPos = Math.abs(position.left - maxLeft + 1);
+      const topPos = Math.abs(position.top - maxTop + 1);
+     
+      // Update the state with the new position
+      setPosition({ top: topPos, left: leftPos });
+    }
+
+    useEffect(() => {
+      // Add the resize event listener
+      window.addEventListener('resize', handleResize);
+     
+      // Clean up on unmount
+      return () => window.removeEventListener('resize', handleResize);
+     }, []);
+
   function getRandomColor(planet) {
       /* const r = Math.floor(Math.random() * planetsColor[planet].r) + (planetsColor[planet].r - 20);
       const g = Math.floor(Math.random() * planetsColor[planet].g) + (planetsColor[planet].g - 20);
