@@ -42,7 +42,7 @@ process.on('currentUserIdSet', (userId) => {
 });
 
 const checkAuth = (req, res, next) => {
-    console.log('Cookie: ' + req.cookies);
+    //console.log('Cookie: ' + req.cookies);
     const token = req.cookies.access_token;
 
     console.log(`token i access: ${token} ${process.env.ACCESS_TOKEN_SECRET}`);
