@@ -16,6 +16,8 @@ process.on('currentUserIdSet', (userId) => {
     console.log(`currentUserIdSet: ${userId}`); //global variable for connected user
 });
 
+const { player, planet, items, ship } = gameState;
+
 let advance = true;
 let stageCount = 10;
 let reset = false;
@@ -34,50 +36,50 @@ WHERE u.id = ? AND ut.item_id = ?`;
 let diamondsQuery = `UPDATE game JOIN users ON game.user_id = users.id SET diamonds = ? WHERE users.id = ?`;
 
 const calculatePlanet = () => {
-    if (gameState.planet.currentLevel == 1) {
-        gameState.planet.maxHp = 10;
-        gameState.planet.currentHp = gameState.planet.maxHp;
+    if (planet.currentLevel == 1) {
+        planet.maxHp = 10;
+        planet.currentHp = planet.maxHp;
         return;
     }
-    gameState.planet.maxHp = (((gameState.planet.currentLevel*2)**2)) - gameState.planet.currentLevel**2;
-    gameState.planet.currentHp = gameState.planet.maxHp;
-    gameState.planet.goldReward = Math.floor(5 * Math.pow(1.2, gameState.planet.currentLevel - 1));
+    planet.maxHp = (((planet.currentLevel*2)**2)) - planet.currentLevel**2;
+    planet.currentHp = planet.maxHp;
+    planet.goldReward = Math.floor(5 * Math.pow(1.2, planet.currentLevel - 1));
     stageCount = 10;
 
-    if (gameState.planet.currentLevel % 10 === 0) {
-        gameState.planet.maxHp = gameState.planet.maxHp * gameState.planet.bossModifier;
-        gameState.planet.currentHp = gameState.planet.maxHp;
-        gameState.planet.goldReward = gameState.planet.goldReward * gameState.planet.bossModifier;
+    if (planet.currentLevel % 10 === 0) {
+        planet.maxHp = planet.maxHp * planet.bossModifier;
+        planet.currentHp = planet.maxHp;
+        planet.goldReward = planet.goldReward * planet.bossModifier;
         stageCount = 1;
     }
 }
 
 const advancePlanet = () => {
-    gameState.planet.currentStage = gameState.planet.currentStage + 1;
-    gameState.planet.maxStage = gameState.planet.maxStage + 1;
-    if (gameState.planet.maxStage > stageCount && gameState.planet.currentStage > stageCount) {
-        gameState.planet.maxLevel += 1;
-        gameState.planet.currentLevel = gameState.planet.maxLevel;
+    planet.currentStage = planet.currentStage + 1;
+    planet.maxStage = planet.maxStage + 1;
+    if (planet.maxStage > stageCount && planet.currentStage > stageCount) {
+        planet.maxLevel += 1;
+        planet.currentLevel = planet.maxLevel;
         calculatePlanet();
         if (stageCount == 1) {
-            gameState.planet.currentStage = 1;
-            gameState.planet.maxStage = 1;
+            planet.currentStage = 1;
+            planet.maxStage = 1;
         } else {
-            gameState.planet.currentStage = 0;
-            gameState.planet.maxStage = 0;
+            planet.currentStage = 0;
+            planet.maxStage = 0;
         }
         
         
-        if (gameState.planet.currentLevel >= gameState.planet.maxLevel) gameState.planet.maxLevel = gameState.planet.currentLevel;
+        if (planet.currentLevel >= planet.maxLevel) planet.maxLevel = planet.currentLevel;
 
         db.query('UPDATE game JOIN users ON game.user_id = users.id SET currentlevel = ?, maxlevel = ?, currentstage = ?, maxstage = ?, currenthp = ?, maxhp = ? WHERE users.id = ?', 
         [
-            gameState.planet.currentLevel, 
-            gameState.planet.maxLevel, 
-            gameState.planet.currentStage, 
-            gameState.planet.maxStage, 
-            gameState.planet.currentHp, 
-            gameState.planet.maxHp, 
+            planet.currentLevel, 
+            planet.maxLevel, 
+            planet.currentStage, 
+            planet.maxStage, 
+            planet.currentHp, 
+            planet.maxHp, 
             userId
         ], (err, data) => {
             if (err) throw err;
@@ -85,7 +87,7 @@ const advancePlanet = () => {
         });
     } else {
         db.query('UPDATE game JOIN users ON game.user_id = users.id SET currentstage = ?, maxstage = ? WHERE users.id = ?', 
-        [gameState.planet.currentStage, gameState.planet.maxStage, userId], (err, data) => {
+        [planet.currentStage, planet.maxStage, userId], (err, data) => {
             if (err) throw err;
             console.log('%c stage updated', 'color: lightblue');
         });
@@ -93,8 +95,8 @@ const advancePlanet = () => {
 }
 
 const earnGold = () => {
-    gameState.player.gold = gameState.player.gold + gameState.planet.goldReward;
-    db.query('UPDATE game JOIN users ON game.user_id = users.id SET gold = ? WHERE users.id = ?', [gameState.player.gold, userId], (err, data) => {
+    player.gold = player.gold + planet.goldReward;
+    db.query('UPDATE game JOIN users ON game.user_id = users.id SET gold = ? WHERE users.id = ?', [player.gold, userId], (err, data) => {
         if (err) throw err;
         console.log('%c gold updated', 'color: yellow');
     });
@@ -103,7 +105,7 @@ const earnGold = () => {
 const calculateCritChance = () => {
     let random = Math.random();
 
-    if (random <= gameState.player.critChance) {
+    if (random <= player.critChance) {
         return isCritical = true;
     } else {
         return isCritical = false;
@@ -111,7 +113,7 @@ const calculateCritChance = () => {
 }
 
 const calculateCritDamage = () => {
-    let dmg = 5 * gameState.player.currentDamage;
+    let dmg = 5 * player.currentDamage;
     crit = dmg;
     console.log(`critical! ${dmg}`);
     return dmg;
@@ -120,11 +122,11 @@ const calculateCritDamage = () => {
 const hitPlanet = () => {
     calculateCritChance();
     if (isCritical == true) {
-        gameState.planet.currentHp -= calculateCritDamage();
+        planet.currentHp -= calculateCritDamage();
     } else if (isCritical == false) {
-        gameState.planet.currentHp -= gameState.player.currentDamage;   
+        planet.currentHp -= player.currentDamage;   
     }
-    if (gameState.planet.currentHp <= 0) {
+    if (planet.currentHp <= 0) {
         calculatePlanet();
         earnGold();
         reset = true;
@@ -137,22 +139,22 @@ const hitPlanet = () => {
 const arrowLeft = () => {
         advance = false;
         
-        if (gameState.planet.currentLevel > 1) {
-            gameState.planet.currentLevel -= 1;
+        if (planet.currentLevel > 1) {
+            planet.currentLevel -= 1;
             calculatePlanet();
-            gameState.planet.currentStage = stageCount;
-            console.log(`arrowGold: ${gameState.planet.goldReward}`);
+            planet.currentStage = stageCount;
+            console.log(`arrowGold: ${planet.goldReward}`);
 
             db.query(arrowQuery, 
-            [gameState.planet.currentLevel, gameState.planet.currentStage, gameState.planet.currentHp, gameState.planet.maxHp, userId], (err, data) => {
+            [planet.currentLevel, planet.currentStage, planet.currentHp, planet.maxHp, userId], (err, data) => {
                 if (err) throw err;
                 console.log('%c levels updated', 'color: lightgreen');
             });
-        } else if (gameState.planet.currentLevel == 1) {
+        } else if (planet.currentLevel == 1) {
             calculatePlanet();
-            gameState.planet.currentStage = stageCount;
+            planet.currentStage = stageCount;
             db.query(arrowQuery, 
-            [gameState.planet.currentLevel, gameState.planet.currentStage, gameState.planet.currentHp, gameState.planet.maxHp, userId], (err, data) => {
+            [planet.currentLevel, planet.currentStage, planet.currentHp, planet.maxHp, userId], (err, data) => {
                 if (err) throw err;
                 console.log('%c levels updated', 'color: lightgreen');
             });
@@ -162,29 +164,29 @@ const arrowLeft = () => {
 
 const arrowRight = () => {
     advance = false;
-    if (gameState.planet.currentLevel < gameState.planet.maxLevel && gameState.planet.currentLevel != gameState.planet.maxLevel) {
-        gameState.planet.currentLevel += 1;
+    if (planet.currentLevel < planet.maxLevel && planet.currentLevel != planet.maxLevel) {
+        planet.currentLevel += 1;
         calculatePlanet();
-        gameState.planet.currentStage = stageCount;
+        planet.currentStage = stageCount;
 
-        if (gameState.planet.currentLevel === gameState.planet.maxLevel) {
+        if (planet.currentLevel === planet.maxLevel) {
             advance = true;
-            gameState.planet.currentStage = gameState.planet.maxStage;
-            console.log(`arrowRight currentStage: ${gameState.planet.currentStage}`);
+            planet.currentStage = planet.maxStage;
+            console.log(`arrowRight currentStage: ${planet.currentStage}`);
         }
 
         db.query(arrowQuery, 
-        [gameState.planet.currentLevel, gameState.planet.currentStage, gameState.planet.currentHp, gameState.planet.maxHp, userId], (err, data) => {
+        [planet.currentLevel, planet.currentStage, planet.currentHp, planet.maxHp, userId], (err, data) => {
             if (err) throw err;
             //console.log('%c levels updated', 'color: lightgreen');
         });
-    } else if (gameState.planet.currentLevel === gameState.planet.maxLevel) {
+    } else if (planet.currentLevel === planet.maxLevel) {
         advance = true;
-        gameState.planet.currentStage = gameState.planet.maxStage;
-        console.log(`arrowRight currentStage: ${gameState.planet.currentStage}`);
+        planet.currentStage = planet.maxStage;
+        console.log(`arrowRight currentStage: ${planet.currentStage}`);
 
         db.query(arrowQuery, 
-        [gameState.planet.currentLevel, gameState.planet.currentStage, gameState.planet.currentHp, gameState.planet.maxHp, userId], (err, data) => {
+        [planet.currentLevel, planet.currentStage, planet.currentHp, planet.maxHp, userId], (err, data) => {
             if (err) throw err;
             //console.log('%c levels updated', 'color: lightgreen');
         });
@@ -192,12 +194,12 @@ const arrowRight = () => {
 }
 
 const buyItem = (name, id) => {
-    if (gameState.player.gold >= gameState['items'][name]['cost']) {
-        gameState.player.gold -= gameState['items'][name]['cost'];
+    if (player.gold >= gameState['items'][name]['cost']) {
+        player.gold -= gameState['items'][name]['cost'];
         gameState['items'][name]['level'] += 1;
         gameState['items'][name]['cost'] = Math.floor((gameState['items'][name]['baseCost']) * 1.05**(gameState['items'][name]['level']));
         gameState['items'][name]['damage'] = Math.floor(gameState['items'][name]['damage'] + (gameState['items'][name]['baseDamage'] * 1.05**gameState['items'][name]['level']));
-        gameState.player.currentDamage += gameState['items'][name]['damage'];
+        player.currentDamage += gameState['items'][name]['damage'];
         console.log(gameState['items'][name]);
 
         db.query(itemQuery, 
@@ -205,7 +207,7 @@ const buyItem = (name, id) => {
             gameState['items'][name]['level'], 
             gameState['items'][name]['cost'], 
             gameState['items'][name]['damage'], 
-            gameState.player.currentDamage,
+            player.currentDamage,
             userId,
             id
         ],
@@ -216,8 +218,8 @@ const buyItem = (name, id) => {
 }
 
 const setDiamonds = () => {
-    gameState.player.diamonds += 1;
-    db.query(diamondsQuery, [gameState.player.diamonds, userId], (err, data) => {
+    player.diamonds += 1;
+    db.query(diamondsQuery, [player.diamonds, userId], (err, data) => {
         if (err) throw err;
     });
 }
@@ -251,7 +253,7 @@ const getMessage = (mess, uid, socket) => {
 }
 
 const setAdminGold = (g) => {
-    gameState.player.gold = g;
+    player.gold = g;
 
     db.query('UPDATE game JOIN users ON game.user_id = users.id SET gold = ? WHERE users.id = ?', [g, userId], (err, data) => {
         if (err) throw err;
@@ -259,7 +261,7 @@ const setAdminGold = (g) => {
 }
 
 const setAdminDiamonds = (d) => {
-    gameState.player.diamonds = d;
+    player.diamonds = d;
 
     db.query('UPDATE game JOIN users ON game.user_id = users.id SET diamonds = ? WHERE users.id = ?', [d, userId], (err, data) => {
         if (err) throw err;
@@ -267,11 +269,11 @@ const setAdminDiamonds = (d) => {
 }
 
 const setAdminLevel = (l) => {
-    gameState.planet.currentLevel = l;
-    if (gameState.planet.maxLevel < gameState.planet.currentLevel) gameState.planet.maxLevel = currentLevel;
+    planet.currentLevel = l;
+    if (planet.maxLevel < planet.currentLevel) planet.maxLevel = currentLevel;
 
     db.query('UPDATE game JOIN users ON game.user_id = users.id SET currentlevel = ?, maxlevel = ? WHERE users.id = ?', 
-    [l, gameState.planet.maxLevel, userId], (err, data) => {
+    [l, planet.maxLevel, userId], (err, data) => {
         if (err) throw err;
     });
 }
@@ -280,9 +282,9 @@ const setAdminStage = (s) => {
     if (s > 10 || s < 0) {
         return;
     } else {
-        gameState.planet.currentStage = s;
-        if (gameState.planet.maxLevel === gameState.planet.currentLevel) gameState.planet.maxStage = gameState.planet.currentStage;
-        if (gameState.planet.currentLevel % 10 === 0) {
+        planet.currentStage = s;
+        if (planet.maxLevel === planet.currentLevel) planet.maxStage = planet.currentStage;
+        if (planet.currentLevel % 10 === 0) {
             stageCount = 1;
         } else {
             stageCount = 10;
@@ -290,13 +292,13 @@ const setAdminStage = (s) => {
     }
 
     db.query('UPDATE game JOIN users ON game.user_id = users.id SET currentstage = ?, maxstage = ? WHERE users.id = ?', 
-    [s, gameState.planet.maxStage, userId], (err, data) => {
+    [s, planet.maxStage, userId], (err, data) => {
         if (err) throw err;
     });
 }
 
 const setAdminCrit = (c) => {
-    if (c < 1 && c >= 0) gameState.player.critChance = c;
+    if (c < 1 && c >= 0) player.critChance = c;
     else return;
 
     console.log(`c: ${c}`);
@@ -359,7 +361,7 @@ module.exports = {
                     console.log(`guildId: ${guildId}`);
                     socket.join(guildId);
                     
-                    socket.to(guildId).emit('receivechat', {currentHp: gameState.planet.currentHp});
+                    socket.to(guildId).emit('receivechat', {currentHp: planet.currentHp});
                 });
             }) */
 
@@ -369,22 +371,22 @@ module.exports = {
             });
 
             socket.on('arrowleft', () => {
-                console.log('arrowleft currentLevel: ' + gameState.planet.currentLevel);
-                console.log('arrowleft maxHp: ' + gameState.planet.maxHp);
+                console.log('arrowleft currentLevel: ' + planet.currentLevel);
+                console.log('arrowleft maxHp: ' + planet.maxHp);
                 arrowLeft();
                 socket.emit('receivearrowleft', {gameState: gameState});
-                console.log('arrowleft maxLevel: ' + gameState.planet.maxLevel);
+                console.log('arrowleft maxLevel: ' + planet.maxLevel);
                 
-                console.log('arrowleft currentLevel after emit: ' + gameState.planet.currentLevel);
-                console.log('arrowleft maxHp after emit: ' + gameState.planet.maxHp);
+                console.log('arrowleft currentLevel after emit: ' + planet.currentLevel);
+                console.log('arrowleft maxHp after emit: ' + planet.maxHp);
             });
 
             socket.on('arrowright', () => {
                 arrowRight();
                 console.log('arrowright');
-                //console.log(gameState.planet.currentHp);
-                console.log('arrowright currentLevel: ' + gameState.planet.currentLevel);
-                console.log('arrowright maxLevel: ' + gameState.planet.maxLevel);
+                //console.log(planet.currentHp);
+                console.log('arrowright currentLevel: ' + planet.currentLevel);
+                console.log('arrowright maxLevel: ' + planet.maxLevel);
                 socket.emit('receivearrowright', {gameState: gameState});
             });
 
