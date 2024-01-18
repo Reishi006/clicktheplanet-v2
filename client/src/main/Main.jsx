@@ -229,6 +229,7 @@ function Main() {
   const generatePlanetName = () => {
     let genName = `1${planetState.currentLevel}-${namePlanet[0]}${namePlanet[(planetState.currentLevel-1)%26]}${namePlanet[planetState.currentStage]}`;
     setPlanetState({...planetState, name: genName});
+    console.log(`planetName generated; genName: ${genName}`);
   }
 
   useEffect(() => {
@@ -296,7 +297,7 @@ function Main() {
   const resetPlanet = (s, bool) => {
       //NOT BOSS
       setPlanetScale(s);
-      generatePlanetName();
+      
 
       if (bool) {
         setTimeout(() => {
@@ -317,6 +318,10 @@ function Main() {
         setRandColor({...randColor, randPlanet: getRandomColor(planet), randHue: hueRotate});
       }
   }
+
+  useEffect(() => {
+    generatePlanetName();
+  }, [planetState.currentStage, planetState.currentLevel]);
 
   const handlePlanet = () => {
       socket.emit('sendclick', 'User clicked');
