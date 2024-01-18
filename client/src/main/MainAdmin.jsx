@@ -298,7 +298,6 @@ function Main() {
   const resetPlanet = (s, bool) => {
       //NOT BOSS
       setPlanetScale(s);
-      generatePlanetName();
 
       if (bool) {
         setTimeout(() => {
@@ -319,6 +318,10 @@ function Main() {
         setRandColor({...randColor, randPlanet: getRandomColor(planet), randHue: hueRotate});
       }
   }
+
+  useEffect(() => {
+    generatePlanetName();
+  }, [planetState.currentStage, planetState.currentLevel]);
 
   const handlePlanet = () => {
       socket.emit('sendclick', 'User clicked');
