@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 15, 2024 at 11:36 PM
+-- Generation Time: Jan 18, 2024 at 04:57 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -50,11 +50,12 @@ CREATE TABLE `game` (
 
 INSERT INTO `game` (`id`, `user_id`, `gold`, `diamonds`, `currentlevel`, `maxlevel`, `currentstage`, `maxstage`, `currenthp`, `maxhp`, `currentdamage`, `totaldamage`, `critchance`, `guild_id`) VALUES
 (10, 10, '123123341', '110', '1', '1', 0, 0, '10', '10', '1', '0', '0.3', NULL),
-(11, 11, '178', '130', '4', '4', 3, 3, '48', '48', '3', '1', '0.1', 3),
+(11, 11, '361124016076', '210', '116', '116', 4, 4, '40368', '40368', '34151', '1', '0.1', 3),
 (12, 12, '100', '100', '21', '21', 6, 6, '1323', '1323', '100', '100', '0.01', 3),
-(33, 26, '100', '100', '1', '1', 0, 0, '10', '10', '1', '0', '0.01', NULL),
+(33, 26, '100', '101', '1', '1', 0, 0, '10', '10', '1', '0', '0.01', NULL),
 (34, 31, '106', '103', '4', '4', 7, 7, '48', '48', '5', '0', '0.01', NULL),
-(35, 32, '100', '101', '1', '1', 0, 0, '10', '10', '1', '0', '0.01', NULL);
+(35, 32, '100', '101', '1', '1', 0, 0, '10', '10', '1', '0', '0.01', NULL),
+(36, 33, '100', '101', '1', '1', 0, 0, '10', '10', '1', '0', '0.01', NULL);
 
 -- --------------------------------------------------------
 
@@ -262,7 +263,8 @@ INSERT INTO `users` (`id`, `email`, `login`, `password`, `admin`, `redeemed`) VA
 (12, 'moststrongestpotato@mail.com', 'MostStrongestPotato', '$2a$10$MSNS3Qq8/744On2MeolpTOyu6fvCnxIS3A8BNVMBNpJ8.i/koUEW.', 0, 0),
 (26, 'gmail@gmail.com', 'Gmail', '$2a$10$Kc4fI8HLIflZBwYvNvMo4e9EX.kJrOJPFDJBgqtc4iKvBT1ShyE3S', 0, 0),
 (31, 'email@email.com', 'Email', '$2a$10$Yu8A32JQoVOD2sV.5JhK.u3mX8XszXdw55mIB4YpYLG45eOrhxdRG', 0, 0),
-(32, 'mail@mail.com', 'Mail', '$2a$10$O1ToRAgAsqdzXGWJaD9TAOOsqqpZgSig/G5sFtzyd/uy7t8dFt6sy', 0, 0);
+(32, 'mail@mail.com', 'Mail', '$2a$10$O1ToRAgAsqdzXGWJaD9TAOOsqqpZgSig/G5sFtzyd/uy7t8dFt6sy', 0, 0),
+(33, 'asd@asd.com', 'Asd', '$2a$10$mR1XnD.lZSL5FfqZZvV.hu.rFV3SxcQ0xYHCWwNHXzdqqAjKgvFay', 0, 0);
 
 -- --------------------------------------------------------
 
@@ -285,9 +287,9 @@ CREATE TABLE `users_items` (
 --
 
 INSERT INTO `users_items` (`id`, `user_id`, `item_id`, `level`, `cost`, `damage`, `locked`) VALUES
-(1, 11, 1, '1', '105', '2', 0),
-(2, 11, 2, '0', '1000', '10', 0),
-(3, 11, 3, '0', '2500', '100', 1),
+(1, 11, 1, '46', '943', '127', 0),
+(2, 11, 2, '35', '5516', '942', 0),
+(3, 11, 3, '16', '54571', '2576', 1),
 (4, 12, 1, '1', '100', '1', 0),
 (5, 12, 2, '0', '500', '1', 1),
 (6, 12, 3, '0', '2500', '1', 1),
@@ -302,7 +304,10 @@ INSERT INTO `users_items` (`id`, `user_id`, `item_id`, `level`, `cost`, `damage`
 (16, 32, 3, '0', '2500', '100', 1),
 (17, 10, 1, '0', '100', '1', 0),
 (18, 10, 2, '0', '1000', '10', 1),
-(19, 10, 3, '0', '2500', '100', 1);
+(19, 10, 3, '0', '2500', '100', 1),
+(20, 33, 1, '0', '100', '1', 0),
+(21, 33, 2, '0', '1000', '10', 1),
+(22, 33, 3, '0', '2500', '100', 1);
 
 --
 -- Indexes for dumped tables
@@ -372,7 +377,7 @@ ALTER TABLE `users_items`
 -- AUTO_INCREMENT for table `game`
 --
 ALTER TABLE `game`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT for table `guilds`
@@ -408,13 +413,13 @@ ALTER TABLE `messages`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- AUTO_INCREMENT for table `users_items`
 --
 ALTER TABLE `users_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- Constraints for dumped tables
