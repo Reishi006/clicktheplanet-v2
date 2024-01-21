@@ -12,6 +12,7 @@ html {
 body {
   min-height: -webkit-fill-available;
   background: url('/public/background.png');
+  background-repeat: no-repeat;
   text-align: center;
   user-select: none;
 }
@@ -129,4 +130,11 @@ input:-webkit-autofill:focus {
 
 .link-container > div {
   padding: 10px;
+}
+
+
+@media (min-width: 1920px) {
+  body {
+    background-size: 100% 100%;
+  }
 }
