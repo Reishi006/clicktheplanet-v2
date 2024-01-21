@@ -97,6 +97,11 @@ function Main() {
     },
   });
 
+  const [allAnim, setAllAnim] = useState(true);
+  const [hitAnim, setHitAnim] = useState(true);
+  const [dmgAnim, setDmgAnim] = useState(true);
+  const [planetAnim, setPlanetAnim] = useState(true);
+
   const [position, setPosition] = useState({ top: 0, left: 0 }); //diamond position;
   const [visible, setVisible] = useState(true);
   const timerRef = useRef();
@@ -104,7 +109,6 @@ function Main() {
   const [planetScale, setPlanetScale] = useState(0.5);
 
   const [spin, setSpin] = useState(0);
-  const [isClicked, setIsClicked] = useState(false);
 
   /* const [isChecked, setIsChecked] = useState({
     option1: false,
@@ -118,6 +122,44 @@ function Main() {
       console.log(data);
     });
   }
+
+  const toggleAllAnim = () => {
+    if (allAnim === false) {
+      setAllAnim(true);
+      setHitAnim(true);
+      setDmgAnim(true);
+      setPlanetAnim(true);
+    }
+    else {
+      setAllAnim(false);
+      setHitAnim(false);
+      setDmgAnim(false);
+      setPlanetAnim(false);
+    }
+    console.log(`toggleAllAnim`);
+  }
+
+  const toggleHitAnim = () => {
+    if (hitAnim === false) setHitAnim(true);
+    else setHitAnim(false);
+    console.log(`toggleHitAnim`);
+  }
+
+  const toggleDmgAnim = () => {
+    if (dmgAnim === false) setDmgAnim(true);
+    else setDmgAnim(false);
+    console.log(`toggleDmgAnim`);
+  }
+
+  const togglePlanetAnim = () => {
+    if (planetAnim === false) setPlanetAnim(true);
+    else setPlanetAnim(false);
+    console.log(`togglePlanetAnim`);
+  }
+
+  useEffect(() => {
+    console.log(`animations: ${allAnim}, ${hitAnim}, ${dmgAnim}, ${planetAnim}`);
+  }, [allAnim, hitAnim, dmgAnim, planetAnim]);
 
   const planets = [planet1, planet2, planet3, planet4, planet5];
   const planetsBosses = [planetboss1, planetboss2, planetboss3, planetboss4, planetboss5];
@@ -296,7 +338,7 @@ function Main() {
 
   const resetPlanet = (s, bool) => {
       //NOT BOSS
-      setPlanetScale(s);
+      planetAnim && setPlanetScale(s);
       
 
       if (bool) {
@@ -348,8 +390,8 @@ function Main() {
         }));
       });
 
-      displayDamageOverlay();
-      displayHitSvg();
+      dmgAnim && displayDamageOverlay();
+      hitAnim && displayHitSvg();
 
       //console.log('from react handlePlanet: '+planetState.currentLevel);
   }
@@ -425,7 +467,7 @@ function Main() {
     });
   }
 
-  const handleSpin = (e) => {
+  /* const handleSpin = (e) => {
   
   setIsClicked(true);
   setSpin(0);
@@ -444,13 +486,13 @@ function Main() {
         });
       }, 0)
     }
-    /* setTimeout(() => {
+    setTimeout(() => {
       setSpin(0);
-    }, 5000); */
+    }, 5000);
   }
 
   useEffect(() => {
-  }, [spin]);
+  }, [spin]); */
 
   const getData = () => {
 
@@ -567,7 +609,7 @@ function Main() {
   <Ship/>, 
   <Stats playerState={playerState} planetState={planetState}/>, 
   <Guild/>, 
-  <Wheel handleSpin={handleSpin} spin={spin}/>];
+  <Wheel /* handleSpin={handleSpin} */ spin={spin}/>];
 
   return (
     <>
@@ -584,20 +626,31 @@ function Main() {
               <div className='navbar-profile-nickname'>{userLogin}</div>
               <img className='navbar-profile-logo' src={user_prof1} alt='user-logo'></img>
             </div>
-            <div className='navbar-bell-container'>
+            {/* <div className='navbar-bell-container'>
               <img className='navbar-bell' onClick={toggleNotifications} src={bell} alt='notifications'></img>
               <div className='navbar-bell-notification'>1</div>
               {display.notifications && <Notifications toggleNotifications={toggleNotifications}></Notifications>}
-            </div>
-            <img src={settings} onClick={toggleSettings} alt='settings'></img>
-            <form method='post' onSubmit={handleLogout}><button type='submit' name='submit'>Logout</button></form>
+            </div> */}
+            <img src={settings} className='navbar-settings-icon' onClick={toggleSettings} alt='settings'></img>
+            <form method='post' className='navbar-logout' onSubmit={handleLogout}><button type='submit' name='submit'>Logout</button></form>
           </div>
-          <div className='navbar-burger'>
-            <div>Burgir</div>
-          </div>
+          {/* <div className='navbar-burger'>
+            <div>One div</div>
+            <div>Or another</div>
+          </div> */}
         </div>
 
-        {display.settings && <Settings toggleSettings={toggleSettings}></Settings>}
+        {display.settings && <Settings 
+        toggleSettings={toggleSettings}
+        toggleAllAnim={toggleAllAnim}
+        toggleHitAnim={toggleHitAnim}
+        toggleDmgAnim={toggleDmgAnim}
+        togglePlanetAnim={togglePlanetAnim}
+        allAnim={allAnim}
+        hitAnim={hitAnim}
+        dmgAnim={dmgAnim}
+        planetAnim={planetAnim}
+        ></Settings>}
         
         <div className='main-container'>
           {/* <h1>Welcome to Main.jsx!</h1>
