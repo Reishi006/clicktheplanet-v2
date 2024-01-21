@@ -212,14 +212,16 @@ form {
     content: "";
     width: 2em;
     height: 1em;
-    background-color: #2E2D4D;
+    /* background-color: #2E2D4D; */
+    background-color: #ccc;
     border-radius: 1em;
     margin-right: .25em;
     transition: 200ms ease-in-out;
   }
   
   .switch:checked + label::before {
-    background-color: #ccc;
+    /* background-color: #ccc; */
+    background-color: #2E2D4D;
   }
   
   .switch + label::after {
@@ -1026,17 +1028,33 @@ form {
         width: 100%;
     }
 
+    .navbar-right > form > button {
+        font-size: 14px;
+    }
+
     .navbar-container {
         padding: 0 0;
     }
 
-    .navbar-right {
+    .navbar-logout {
+        font-size: 12px;
+    }
+
+    .navbar-logout > button {
+        font-size: 10px;
+    }
+
+    .navbar-profile-nickname, .navbar-profile-logo {
+        display: none
+    }
+
+    /* .navbar-right {
         display: none;
     }
 
     .navbar-burger {
         display: block;
-    }
+    } */
 
     .money-container {
         font-size: var(--panelsFont);
@@ -1093,6 +1111,13 @@ form {
 
 
 @media (max-width: 425px) {
+
+    .navbar-settings-icon {
+        width: 30px;
+        height: 30px;
+    }
+
+
     .store-item-desc {
         display: none;
     }
