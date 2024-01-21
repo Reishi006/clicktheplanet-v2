@@ -2,7 +2,17 @@ import x from '../assets/env/x.svg';
 
 import { useState } from 'react';
 
-export default function Settings({ toggleSettings, handleCheck, isChecked }) {
+export default function Settings({ 
+    toggleSettings, 
+    toggleAllAnim, 
+    toggleHitAnim, 
+    toggleDmgAnim,
+    togglePlanetAnim,
+    allAnim,
+    hitAnim,
+    dmgAnim,
+    planetAnim
+}) {
 
     return (
         
@@ -21,16 +31,20 @@ export default function Settings({ toggleSettings, handleCheck, isChecked }) {
                 <div>Toggle critical hit animation: On/Off</div> */}
             <form>
                 <div className='option'>
-                    <input type="checkbox" id="option1" name="option1" onClick={handleCheck} className="switch"/>
+                    <input type="checkbox" id="option1" name="option1" onClick={toggleAllAnim} checked={allAnim} onChange={() => {}} className="switch"/>
                     <label htmlFor="option1">On/Off All animations</label>
                 </div>
                 <div className="option">
-                    <input type="checkbox" id="option2" name="option2" onClick={handleCheck} className="switch"/>
+                    <input type="checkbox" id="option2" name="option2" onClick={toggleHitAnim} checked={hitAnim} onChange={() => {}} className="switch"/>
                     <label htmlFor="option2">On/Off Hit animation</label>
                 </div>
                 <div className="option">
-                    <input type="checkbox" id="option3" name="option3" onClick={handleCheck} className="switch"/>
+                    <input type="checkbox" id="option3" name="option3" onClick={toggleDmgAnim} checked={dmgAnim} onChange={() => {}} className="switch"/>
                     <label htmlFor="option3">On/Off Dealt damage animation</label>
+                </div>
+                <div className="option">
+                    <input type="checkbox" id="option4" name="option4" onClick={togglePlanetAnim} checked={planetAnim} onChange={() => {}} className="switch"/>
+                    <label htmlFor="option4">On/Off Planet reset animation</label>
                 </div>
             </form>
             </div>
