@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 18, 2024 at 04:57 PM
+-- Generation Time: Jan 21, 2024 at 01:18 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -49,13 +49,14 @@ CREATE TABLE `game` (
 --
 
 INSERT INTO `game` (`id`, `user_id`, `gold`, `diamonds`, `currentlevel`, `maxlevel`, `currentstage`, `maxstage`, `currenthp`, `maxhp`, `currentdamage`, `totaldamage`, `critchance`, `guild_id`) VALUES
-(10, 10, '123123341', '110', '1', '1', 0, 0, '10', '10', '1', '0', '0.3', NULL),
-(11, 11, '361124016076', '210', '116', '116', 4, 4, '40368', '40368', '34151', '1', '0.1', 3),
+(10, 10, '1231', '1', '3', '1232', 0, 0, '27', '27', '23', '0', '0.03', NULL),
+(11, 11, '6305796390981', '234', '132', '132', 4, 4, '52272', '52272', '567368', '1', '0.1', 3),
 (12, 12, '100', '100', '21', '21', 6, 6, '1323', '1323', '100', '100', '0.01', 3),
 (33, 26, '100', '101', '1', '1', 0, 0, '10', '10', '1', '0', '0.01', NULL),
-(34, 31, '106', '103', '4', '4', 7, 7, '48', '48', '5', '0', '0.01', NULL),
+(34, 31, '380', '108', '7', '7', 0, 0, '147', '147', '5', '0', '0.01', NULL),
 (35, 32, '100', '101', '1', '1', 0, 0, '10', '10', '1', '0', '0.01', NULL),
-(36, 33, '100', '101', '1', '1', 0, 0, '10', '10', '1', '0', '0.01', NULL);
+(36, 33, '48', '105', '3', '3', 3, 3, '27', '27', '6', '0', '0.01', NULL),
+(37, 34, '77', '110', '1', '2', 10, 3, '10', '10', '3', '0', '0.01', NULL);
 
 -- --------------------------------------------------------
 
@@ -115,8 +116,7 @@ CREATE TABLE `invitations` (
 --
 
 INSERT INTO `invitations` (`id`, `guild_id`, `user_id`) VALUES
-(6, 4, 12),
-(8, 4, 11);
+(6, 4, 12);
 
 -- --------------------------------------------------------
 
@@ -241,6 +241,27 @@ INSERT INTO `messages` (`id`, `user`, `message`, `date_sent`, `guild_id`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `ship`
+--
+
+CREATE TABLE `ship` (
+  `id` int(11) NOT NULL,
+  `name` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `ship`
+--
+
+INSERT INTO `ship` (`id`, `name`) VALUES
+(1, 'Boost damage per second'),
+(2, 'Upgrade damage dealt'),
+(3, 'Upgrade critical hit chance'),
+(4, 'Upgrade gold gained');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `users`
 --
 
@@ -264,7 +285,8 @@ INSERT INTO `users` (`id`, `email`, `login`, `password`, `admin`, `redeemed`) VA
 (26, 'gmail@gmail.com', 'Gmail', '$2a$10$Kc4fI8HLIflZBwYvNvMo4e9EX.kJrOJPFDJBgqtc4iKvBT1ShyE3S', 0, 0),
 (31, 'email@email.com', 'Email', '$2a$10$Yu8A32JQoVOD2sV.5JhK.u3mX8XszXdw55mIB4YpYLG45eOrhxdRG', 0, 0),
 (32, 'mail@mail.com', 'Mail', '$2a$10$O1ToRAgAsqdzXGWJaD9TAOOsqqpZgSig/G5sFtzyd/uy7t8dFt6sy', 0, 0),
-(33, 'asd@asd.com', 'Asd', '$2a$10$mR1XnD.lZSL5FfqZZvV.hu.rFV3SxcQ0xYHCWwNHXzdqqAjKgvFay', 0, 0);
+(33, 'asd@asd.com', 'Asd', '$2a$10$mR1XnD.lZSL5FfqZZvV.hu.rFV3SxcQ0xYHCWwNHXzdqqAjKgvFay', 0, 0),
+(34, 'rty@mail.com', 'Rty', '$2a$10$R/SYDY89N3VbqvNFOfCRgeTD6NtuljZRVehN/NWI3nAsJ3QPKDLPC', 0, 0);
 
 -- --------------------------------------------------------
 
@@ -287,9 +309,9 @@ CREATE TABLE `users_items` (
 --
 
 INSERT INTO `users_items` (`id`, `user_id`, `item_id`, `level`, `cost`, `damage`, `locked`) VALUES
-(1, 11, 1, '46', '943', '127', 0),
+(1, 11, 1, '56', '1536', '120', 0),
 (2, 11, 2, '35', '5516', '942', 0),
-(3, 11, 3, '16', '54571', '2576', 1),
+(3, 11, 3, '57', '403394', '31858', 1),
 (4, 12, 1, '1', '100', '1', 0),
 (5, 12, 2, '0', '500', '1', 1),
 (6, 12, 3, '0', '2500', '1', 1),
@@ -302,12 +324,40 @@ INSERT INTO `users_items` (`id`, `user_id`, `item_id`, `level`, `cost`, `damage`
 (14, 32, 1, '0', '100', '1', 0),
 (15, 32, 2, '0', '1000', '10', 1),
 (16, 32, 3, '0', '2500', '100', 1),
-(17, 10, 1, '0', '100', '1', 0),
+(17, 10, 1, '6', '134', '6', 0),
 (18, 10, 2, '0', '1000', '10', 1),
 (19, 10, 3, '0', '2500', '100', 1),
-(20, 33, 1, '0', '100', '1', 0),
+(20, 33, 1, '2', '110', '3', 0),
 (21, 33, 2, '0', '1000', '10', 1),
-(22, 33, 3, '0', '2500', '100', 1);
+(22, 33, 3, '0', '2500', '100', 1),
+(23, 34, 1, '1', '105', '2', 0),
+(24, 34, 2, '0', '1000', '10', 1),
+(25, 34, 3, '0', '2500', '100', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users_ship`
+--
+
+CREATE TABLE `users_ship` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `ship_id` int(11) NOT NULL,
+  `level` varchar(50) NOT NULL,
+  `cost` varchar(50) NOT NULL,
+  `multiplier` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `users_ship`
+--
+
+INSERT INTO `users_ship` (`id`, `user_id`, `ship_id`, `level`, `cost`, `multiplier`) VALUES
+(2, 10, 2, '0', '10000', '1.00'),
+(4, 10, 1, '0', '1000', '0.01'),
+(5, 10, 3, '0', '50000', '1.00'),
+(6, 10, 4, '0', '50000', '1.00');
 
 --
 -- Indexes for dumped tables
@@ -356,6 +406,12 @@ ALTER TABLE `messages`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `ship`
+--
+ALTER TABLE `ship`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -370,6 +426,14 @@ ALTER TABLE `users_items`
   ADD KEY `user_id` (`user_id`);
 
 --
+-- Indexes for table `users_ship`
+--
+ALTER TABLE `users_ship`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `ship_id` (`ship_id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -377,7 +441,7 @@ ALTER TABLE `users_items`
 -- AUTO_INCREMENT for table `game`
 --
 ALTER TABLE `game`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- AUTO_INCREMENT for table `guilds`
@@ -410,16 +474,28 @@ ALTER TABLE `messages`
   MODIFY `id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=189;
 
 --
+-- AUTO_INCREMENT for table `ship`
+--
+ALTER TABLE `ship`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- AUTO_INCREMENT for table `users_items`
 --
 ALTER TABLE `users_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+
+--
+-- AUTO_INCREMENT for table `users_ship`
+--
+ALTER TABLE `users_ship`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- Constraints for dumped tables
@@ -458,6 +534,13 @@ ALTER TABLE `invitations`
 ALTER TABLE `users_items`
   ADD CONSTRAINT `users_items_ibfk_1` FOREIGN KEY (`item_id`) REFERENCES `items` (`id`),
   ADD CONSTRAINT `users_items_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+--
+-- Constraints for table `users_ship`
+--
+ALTER TABLE `users_ship`
+  ADD CONSTRAINT `users_ship_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+  ADD CONSTRAINT `users_ship_ibfk_2` FOREIGN KEY (`ship_id`) REFERENCES `ship` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
