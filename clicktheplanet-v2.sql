@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 21, 2024 at 01:18 PM
+-- Generation Time: Jan 21, 2024 at 10:38 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -49,14 +49,13 @@ CREATE TABLE `game` (
 --
 
 INSERT INTO `game` (`id`, `user_id`, `gold`, `diamonds`, `currentlevel`, `maxlevel`, `currentstage`, `maxstage`, `currenthp`, `maxhp`, `currentdamage`, `totaldamage`, `critchance`, `guild_id`) VALUES
-(10, 10, '1231', '1', '3', '1232', 0, 0, '27', '27', '23', '0', '0.03', NULL),
-(11, 11, '6305796390981', '234', '132', '132', 4, 4, '52272', '52272', '567368', '1', '0.1', 3),
-(12, 12, '100', '100', '21', '21', 6, 6, '1323', '1323', '100', '100', '0.01', 3),
-(33, 26, '100', '101', '1', '1', 0, 0, '10', '10', '1', '0', '0.01', NULL),
-(34, 31, '380', '108', '7', '7', 0, 0, '147', '147', '5', '0', '0.01', NULL),
-(35, 32, '100', '101', '1', '1', 0, 0, '10', '10', '1', '0', '0.01', NULL),
-(36, 33, '48', '105', '3', '3', 3, 3, '27', '27', '6', '0', '0.01', NULL),
-(37, 34, '77', '110', '1', '2', 10, 3, '10', '10', '3', '0', '0.01', NULL);
+(10, 10, '123132', '1', '3', '1232', 0, 0, '27', '27', '23', '0', '0.03', NULL),
+(41, 38, '1725307', '110', '7', '7', 1, 1, '147', '147', '59', '2953', '0.01', NULL),
+(42, 39, '5019329', '110', '38', '38', 10, 10, '4332', '4332', '3335', '1196143', '0.01', NULL),
+(43, 40, '1854402', '107', '34', '34', 8, 8, '3468', '3468', '1206', '725343.8300000002', '0.01', NULL),
+(44, 41, '5673', '102', '3', '3', 9, 9, '27', '27', '9', '554', '0.01', NULL),
+(45, 42, '68410', '113', '19', '19', 10, 10, '1083', '1083', '340', '95582', '0.01', NULL),
+(46, 43, '100', '100', '1', '1', 0, 0, '10', '10', '1', '0', '0.01', NULL);
 
 -- --------------------------------------------------------
 
@@ -71,14 +70,6 @@ CREATE TABLE `guilds` (
   `guild_members_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `guilds`
---
-
-INSERT INTO `guilds` (`id`, `name`, `owner`, `guild_members_id`) VALUES
-(3, 'Galaxy conquerors', 11, 3),
-(4, 'Clickers', 10, 4);
-
 -- --------------------------------------------------------
 
 --
@@ -91,14 +82,6 @@ CREATE TABLE `guild_members` (
   `guild_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `guild_members`
---
-
-INSERT INTO `guild_members` (`id`, `user_id`, `guild_id`) VALUES
-(3, 11, 3),
-(4, 11, 3);
-
 -- --------------------------------------------------------
 
 --
@@ -110,13 +93,6 @@ CREATE TABLE `invitations` (
   `guild_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `invitations`
---
-
-INSERT INTO `invitations` (`id`, `guild_id`, `user_id`) VALUES
-(6, 4, 12);
 
 -- --------------------------------------------------------
 
@@ -280,13 +256,12 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`id`, `email`, `login`, `password`, `admin`, `redeemed`) VALUES
 (10, 'hello@mail.com', 'Hello', '$2a$10$0WrhDWNoA2IQL6J7aGOA2O3uYkz9Tc/eEjXjjumMtvhcGb.KIrBRW', 1, 0),
-(11, 'qwe@mail.com', 'Qwe', '$2a$10$lINez2/4OXVjAVtY5Ajr/uw/S5vaIPGq.JCPq6Hki0SkmIbXSblRC', 0, 0),
-(12, 'moststrongestpotato@mail.com', 'MostStrongestPotato', '$2a$10$MSNS3Qq8/744On2MeolpTOyu6fvCnxIS3A8BNVMBNpJ8.i/koUEW.', 0, 0),
-(26, 'gmail@gmail.com', 'Gmail', '$2a$10$Kc4fI8HLIflZBwYvNvMo4e9EX.kJrOJPFDJBgqtc4iKvBT1ShyE3S', 0, 0),
-(31, 'email@email.com', 'Email', '$2a$10$Yu8A32JQoVOD2sV.5JhK.u3mX8XszXdw55mIB4YpYLG45eOrhxdRG', 0, 0),
-(32, 'mail@mail.com', 'Mail', '$2a$10$O1ToRAgAsqdzXGWJaD9TAOOsqqpZgSig/G5sFtzyd/uy7t8dFt6sy', 0, 0),
-(33, 'asd@asd.com', 'Asd', '$2a$10$mR1XnD.lZSL5FfqZZvV.hu.rFV3SxcQ0xYHCWwNHXzdqqAjKgvFay', 0, 0),
-(34, 'rty@mail.com', 'Rty', '$2a$10$R/SYDY89N3VbqvNFOfCRgeTD6NtuljZRVehN/NWI3nAsJ3QPKDLPC', 0, 0);
+(38, 'qwe@mail.com', 'Qwe', '$2a$10$o2UDHmxjHvOUYii11OC1PewyNPO4BQPM5pz2B3xbFSfsrU/a.4gp.', 0, 0),
+(39, 'zxc@mail.com', 'Zxc', '$2a$10$TiGg28nDMZ1CNnbOtfBULO35vYS7nD7y2cIPMYs795MzI5v0pCk9q', 0, 0),
+(40, 'asd@mail.com', 'Asd', '$2a$10$AGbG521Shjbrnucrzy7hoO.1VG9iJJTLCcEqYN84ZbJcC8JLw.7LG', 0, 0),
+(41, 'email@email.com', 'Email', '$2a$10$AM2slCmbSznH4b6CKjc8lOy/0CEtRH0ZilhSoFcex5AJYVTZWvANi', 0, 0),
+(42, 'mail@mail.com', 'Mail', '$2a$10$aRRr77WrA0xAPovhpDSH4O04qVwskTP1tRAcfT76v9LcPOY3S8phW', 0, 0),
+(43, 'gmail@gmail.com', 'Gmail', '$2a$10$Ic78L9BuplP0oapRcjYo0uRbA/bc72RcHRa332YaXtefBqBppaD9e', 0, 0);
 
 -- --------------------------------------------------------
 
@@ -309,30 +284,27 @@ CREATE TABLE `users_items` (
 --
 
 INSERT INTO `users_items` (`id`, `user_id`, `item_id`, `level`, `cost`, `damage`, `locked`) VALUES
-(1, 11, 1, '56', '1536', '120', 0),
-(2, 11, 2, '35', '5516', '942', 0),
-(3, 11, 3, '57', '403394', '31858', 1),
-(4, 12, 1, '1', '100', '1', 0),
-(5, 12, 2, '0', '500', '1', 1),
-(6, 12, 3, '0', '2500', '1', 1),
-(8, 26, 1, '0', '100', '1', 0),
-(9, 26, 2, '0', '1000', '10', 1),
-(10, 26, 3, '0', '2500', '100', 1),
-(11, 31, 1, '2', '110', '2', 0),
-(12, 31, 2, '0', '1000', '10', 1),
-(13, 31, 3, '0', '2500', '100', 1),
-(14, 32, 1, '0', '100', '1', 0),
-(15, 32, 2, '0', '1000', '10', 1),
-(16, 32, 3, '0', '2500', '100', 1),
 (17, 10, 1, '6', '134', '6', 0),
 (18, 10, 2, '0', '1000', '10', 1),
 (19, 10, 3, '0', '2500', '100', 1),
-(20, 33, 1, '2', '110', '3', 0),
-(21, 33, 2, '0', '1000', '10', 1),
-(22, 33, 3, '0', '2500', '100', 1),
-(23, 34, 1, '1', '105', '2', 0),
-(24, 34, 2, '0', '1000', '10', 1),
-(25, 34, 3, '0', '2500', '100', 1);
+(35, 38, 1, '27', '373', '43', 0),
+(36, 38, 2, '0', '1000', '0', 1),
+(37, 38, 3, '0', '2500', '0', 1),
+(38, 39, 1, '45', '898', '109', 0),
+(39, 39, 2, '6', '1340', '69', 1),
+(40, 39, 3, '11', '42758', '1487', 1),
+(41, 40, 1, '14', '197', '15', 0),
+(42, 40, 2, '6', '1340', '69', 1),
+(43, 40, 3, '6', '33502', '712', 1),
+(44, 41, 1, '7', '140', '8', 0),
+(45, 41, 2, '0', '1000', '0', 1),
+(46, 41, 3, '0', '2500', '0', 1),
+(47, 42, 1, '60', '1867', '339', 0),
+(48, 42, 2, '0', '1000', '0', 1),
+(49, 42, 3, '0', '2500', '0', 1),
+(50, 43, 1, '0', '100', '0', 0),
+(51, 43, 2, '0', '1000', '0', 1),
+(52, 43, 3, '0', '2500', '0', 1);
 
 -- --------------------------------------------------------
 
@@ -357,7 +329,31 @@ INSERT INTO `users_ship` (`id`, `user_id`, `ship_id`, `level`, `cost`, `multipli
 (2, 10, 2, '0', '10000', '1.00'),
 (4, 10, 1, '0', '1000', '0.01'),
 (5, 10, 3, '0', '50000', '1.00'),
-(6, 10, 4, '0', '50000', '1.00');
+(6, 10, 4, '0', '50000', '1.00'),
+(23, 38, 1, '175', '5106547', '1.76'),
+(24, 38, 2, '33', '50031', '1.33'),
+(25, 38, 3, '13', '94282', '1.13'),
+(26, 38, 4, '11', '85516', '1.11'),
+(27, 39, 1, '57', '16135', '1.15'),
+(28, 39, 2, '114', '2603634', '2.14'),
+(29, 39, 3, '99', '6261964', '1.99'),
+(30, 39, 4, '1', '52500', '1.01'),
+(31, 40, 1, '29', '4116', '0.59'),
+(32, 40, 2, '27', '37334', '1.54'),
+(33, 40, 3, '63', '2162349', '7.3'),
+(34, 40, 4, '124', '42410469', '3.48'),
+(35, 41, 1, '0', '1000', '0.01'),
+(36, 41, 2, '0', '10000', '1.00'),
+(37, 41, 3, '0', '50000', '1.00'),
+(38, 41, 4, '0', '50000', '1.00'),
+(39, 42, 1, '39', '6704', '0.79'),
+(40, 42, 2, '0', '10000', '1.00'),
+(41, 42, 3, '0', '50000', '1.00'),
+(42, 42, 4, '0', '50000', '1.00'),
+(43, 43, 1, '0', '1000', '0.01'),
+(44, 43, 2, '0', '10000', '1.00'),
+(45, 43, 3, '0', '50000', '1.00'),
+(46, 43, 4, '0', '50000', '1.00');
 
 --
 -- Indexes for dumped tables
@@ -374,16 +370,13 @@ ALTER TABLE `game`
 -- Indexes for table `guilds`
 --
 ALTER TABLE `guilds`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `guild_members_id` (`guild_members_id`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `guild_members`
 --
 ALTER TABLE `guild_members`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `guild_id` (`guild_id`),
-  ADD KEY `user_id` (`user_id`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `invitations`
@@ -441,7 +434,7 @@ ALTER TABLE `users_ship`
 -- AUTO_INCREMENT for table `game`
 --
 ALTER TABLE `game`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
 
 --
 -- AUTO_INCREMENT for table `guilds`
@@ -483,19 +476,19 @@ ALTER TABLE `ship`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 
 --
 -- AUTO_INCREMENT for table `users_items`
 --
 ALTER TABLE `users_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
 
 --
 -- AUTO_INCREMENT for table `users_ship`
 --
 ALTER TABLE `users_ship`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
 
 --
 -- Constraints for dumped tables
@@ -508,18 +501,10 @@ ALTER TABLE `game`
   ADD CONSTRAINT `game_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
 --
--- Constraints for table `guilds`
---
-ALTER TABLE `guilds`
-  ADD CONSTRAINT `guilds_ibfk_1` FOREIGN KEY (`guild_members_id`) REFERENCES `guild_members` (`id`);
-
---
 -- Constraints for table `guild_members`
 --
 ALTER TABLE `guild_members`
-  ADD CONSTRAINT `guild_members_ibfk_1` FOREIGN KEY (`id`) REFERENCES `guilds` (`guild_members_id`),
-  ADD CONSTRAINT `guild_members_ibfk_2` FOREIGN KEY (`guild_id`) REFERENCES `guilds` (`id`),
-  ADD CONSTRAINT `guild_members_ibfk_3` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+  ADD CONSTRAINT `guild_members_ibfk_1` FOREIGN KEY (`id`) REFERENCES `guilds` (`guild_members_id`);
 
 --
 -- Constraints for table `invitations`
