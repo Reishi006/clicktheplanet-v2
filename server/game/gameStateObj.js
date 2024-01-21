@@ -3,7 +3,7 @@ const gameState = {
         gold: 100,
         diamonds: 100,
         currentDamage: 1,
-        critChance: 0.1,
+        critChance: 0.01,
         totalDamage: 0,
     },
     planet: {
@@ -50,25 +50,28 @@ const gameState = {
     ship: {
         dps: {
             level: 0,
-            cost: 10000,
-            baseCost: 100000,
+            cost: 1000,
+            baseCost: 1000,
             baseDamage: 1,
+            multiplier: 0.01,
         },
         damageDealt: {
             level: 0,
-            cost: 100000,
-            baseCost: 100000,
-            baseMultiplier: 1.05,
+            cost: 10000,
+            baseCost: 10000,
+            multiplier: 1.00,
         },
         critChance: {
             level: 0,
-            cost: 100000,
-            baseChance: 0.01,
+            cost: 50000,
+            baseCost: 100000,
+            multiplier: 1.00,
         },
         gold: {
             level: 0,
-            cost: 100000,
-            baseMultiplier: 1.05,
+            cost: 50000,
+            baseCost: 100000,
+            multiplier: 1.00,
         }
     }
 }

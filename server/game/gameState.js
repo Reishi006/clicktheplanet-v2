@@ -33,6 +33,11 @@ JOIN users u ON ut.user_id = u.id
 JOIN game ga ON u.id = ga.user_id
 SET ut.level = ?, ut.cost = ?, ut.damage = ?, ga.currentdamage = ?
 WHERE u.id = ? AND ut.item_id = ?`;
+let shipQuery = `UPDATE users_ship us
+JOIN users u ON us.user_id = u.id
+JOIN game ga ON u.id = ga.user_id
+SET us.level = ?, us.cost = ?, us.multiplier = ?, ga.currentdamage = ?
+WHERE u.id = ? AND us.ship_id = ?`;
 let diamondsQuery = `UPDATE game JOIN users ON game.user_id = users.id SET diamonds = ? WHERE users.id = ?`;
 
 const calculatePlanet = () => {
@@ -43,7 +48,7 @@ const calculatePlanet = () => {
     }
     planet.maxHp = (((planet.currentLevel*2)**2)) - planet.currentLevel**2;
     planet.currentHp = planet.maxHp;
-    planet.goldReward = Math.floor(5 * Math.pow(1.2, planet.currentLevel - 1));
+    planet.goldReward = Math.ceil((planet.maxHp / 10 ** (planet.currentLevel**0.05)) * ship.gold.multiplier);
     stageCount = 10;
 
     if (planet.currentLevel % 10 === 0) {
@@ -72,22 +77,23 @@ const advancePlanet = () => {
         
         if (planet.currentLevel >= planet.maxLevel) planet.maxLevel = planet.currentLevel;
 
-        db.query('UPDATE game JOIN users ON game.user_id = users.id SET currentlevel = ?, maxlevel = ?, currentstage = ?, maxstage = ?, currenthp = ?, maxhp = ? WHERE users.id = ?', 
+        db.query('UPDATE game JOIN users ON game.user_id = users.id SET currentlevel = ?, maxlevel = ?, currentstage = ?, maxstage = ?, currenthp = ?, maxhp = ?, totaldamage = ? WHERE users.id = ?', 
         [
             planet.currentLevel, 
             planet.maxLevel, 
             planet.currentStage, 
             planet.maxStage, 
             planet.currentHp, 
-            planet.maxHp, 
+            planet.maxHp,
+            player.totalDamage,
             userId
         ], (err, data) => {
             if (err) throw err;
             console.log('%c levels updated', 'color: lightgreen');
         });
     } else {
-        db.query('UPDATE game JOIN users ON game.user_id = users.id SET currentstage = ?, maxstage = ? WHERE users.id = ?', 
-        [planet.currentStage, planet.maxStage, userId], (err, data) => {
+        db.query('UPDATE game JOIN users ON game.user_id = users.id SET currentstage = ?, maxstage = ?, totaldamage = ? WHERE users.id = ?', 
+        [planet.currentStage, planet.maxStage, player.totalDamage, userId], (err, data) => {
             if (err) throw err;
             console.log('%c stage updated', 'color: lightblue');
         });
@@ -100,6 +106,30 @@ const earnGold = () => {
         if (err) throw err;
         console.log('%c gold updated', 'color: yellow');
     });
+}
+
+const calculateCurrentDamage = () => {
+    player.currentDamage = Math.ceil(
+        (
+            1 +
+            items.blueLaserGun.damage +
+            items.greenLaserGun.damage +
+            items.redLaserGun.damage
+        ) *
+        ship.damageDealt.multiplier
+    );
+    console.log(items.blueLaserGun.damage +
+        items.greenLaserGun.damage +
+        items.redLaserGun.damage);
+    console.log(`player.currentDamage: ${player.currentDamage}`);
+}
+
+const calculatePlayerCrit = () => {
+    player.critChance = (
+        0.01 * ship.critChance.multiplier
+    ).toFixed(4);
+
+    console.log(`critChance: ${player.critChance}`);
 }
 
 const calculateCritChance = () => {
@@ -119,12 +149,36 @@ const calculateCritDamage = () => {
     return dmg;
 }
 
+const dpsPlanet = () => {
+    if (ship.dps.level >= 1) {
+        planet.currentHp -= Math.ceil(player.currentDamage * (ship.dps.multiplier));
+        player.totalDamage += Math.ceil(player.currentDamage * (ship.dps.multiplier));
+
+        console.log(`dps damage`);
+
+        if (planet.currentHp <= 0) {
+            calculatePlanet();
+            earnGold();
+            reset = true;
+            if (advance) advancePlanet();
+        } else {
+            reset = false;
+        }
+    }
+}
+
+setInterval(() => {
+    dpsPlanet();
+}, 1000);
+
 const hitPlanet = () => {
     calculateCritChance();
     if (isCritical == true) {
         planet.currentHp -= calculateCritDamage();
+        player.totalDamage += calculateCritDamage();
     } else if (isCritical == false) {
         planet.currentHp -= player.currentDamage;   
+        player.totalDamage += player.currentDamage;
     }
     if (planet.currentHp <= 0) {
         calculatePlanet();
@@ -199,7 +253,7 @@ const buyItem = (name, id) => {
         gameState['items'][name]['level'] += 1;
         gameState['items'][name]['cost'] = Math.floor((gameState['items'][name]['baseCost']) * 1.05**(gameState['items'][name]['level']));
         gameState['items'][name]['damage'] = Math.floor(gameState['items'][name]['damage'] + (gameState['items'][name]['baseDamage'] * 1.05**gameState['items'][name]['level']));
-        player.currentDamage += gameState['items'][name]['damage'];
+        calculateCurrentDamage();
         console.log(gameState['items'][name]);
 
         db.query(itemQuery, 
@@ -207,6 +261,34 @@ const buyItem = (name, id) => {
             gameState['items'][name]['level'], 
             gameState['items'][name]['cost'], 
             gameState['items'][name]['damage'], 
+            player.currentDamage,
+            userId,
+            id
+        ],
+            (err, data) => {
+                if (err) throw err;
+            });
+        }
+}
+
+const buyShip = (name, id) => {
+    if (player.gold >= gameState['ship'][name]['cost']) {
+        player.gold -= gameState['ship'][name]['cost'];
+        gameState['ship'][name]['level'] += 1;
+        gameState['ship'][name]['cost'] = Math.floor((gameState['ship'][name]['baseCost']) * 1.05**(gameState['ship'][name]['level']));
+        if (name == 'dps') gameState['ship'][name]['multiplier'] = (((0.02 * gameState['ship'][name]['level'])) + 0.01).toFixed(2);
+        else if (name == 'critChance') gameState['ship'][name]['multiplier'] = (1 + (gameState['ship'][name]['level'] * 0.1)).toFixed(1);
+        else gameState['ship'][name]['multiplier'] = (1 + (gameState['ship'][name]['level'] * 0.02)).toFixed(2);
+
+        calculateCurrentDamage();
+        calculatePlayerCrit();
+        console.log(gameState['ship'][name]);
+
+        db.query(shipQuery, 
+        [
+            gameState['ship'][name]['level'], 
+            gameState['ship'][name]['cost'], 
+            gameState['ship'][name]['multiplier'], 
             player.currentDamage,
             userId,
             id
@@ -253,35 +335,54 @@ const getMessage = (mess, uid, socket) => {
 }
 
 const setAdminGold = (g) => {
-    player.gold = g;
+    if (!isNaN(g) && g >= 0) {
+        console.log(`is a number ${g}`);
+        player.gold = g;
 
-    db.query('UPDATE game JOIN users ON game.user_id = users.id SET gold = ? WHERE users.id = ?', [g, userId], (err, data) => {
-        if (err) throw err;
-    });
+        db.query('UPDATE game JOIN users ON game.user_id = users.id SET gold = ? WHERE users.id = ?', [g, userId], (err, data) => {
+            if (err) throw err;
+        });
+    }
 }
 
 const setAdminDiamonds = (d) => {
-    player.diamonds = d;
+    if (!isNaN(d) && d >= 0) {
+        player.diamonds = d;
 
-    db.query('UPDATE game JOIN users ON game.user_id = users.id SET diamonds = ? WHERE users.id = ?', [d, userId], (err, data) => {
-        if (err) throw err;
-    });
+        db.query('UPDATE game JOIN users ON game.user_id = users.id SET diamonds = ? WHERE users.id = ?', [d, userId], (err, data) => {
+            if (err) throw err;
+        });
+    }
 }
 
 const setAdminLevel = (l) => {
-    planet.currentLevel = l;
-    if (planet.maxLevel < planet.currentLevel) planet.maxLevel = currentLevel;
+    if (!isNaN(l) && l >= 1) {
+        planet.currentLevel = l;
+        if (planet.maxLevel < planet.currentLevel) planet.maxLevel = planet.currentLevel;
 
-    db.query('UPDATE game JOIN users ON game.user_id = users.id SET currentlevel = ?, maxlevel = ? WHERE users.id = ?', 
-    [l, planet.maxLevel, userId], (err, data) => {
-        if (err) throw err;
-    });
+        calculatePlanet();
+        console.log(player.gold);
+
+        db.query('UPDATE game JOIN users ON game.user_id = users.id SET currentlevel = ?, maxlevel = ?, currentstage = ?, maxstage = ?, currenthp = ?, maxhp = ? WHERE users.id = ?', 
+        [
+            planet.currentLevel, 
+            planet.maxLevel, 
+            planet.currentStage, 
+            planet.maxStage, 
+            planet.currentHp, 
+            planet.maxHp, 
+            userId
+        ], (err, data) => {
+            if (err) throw err;
+            console.log(userId);
+        });
+    }
 }
 
 const setAdminStage = (s) => {
     if (s > 10 || s < 0) {
         return;
-    } else {
+    } else if (!isNaN(s)) {
         planet.currentStage = s;
         if (planet.maxLevel === planet.currentLevel) planet.maxStage = planet.currentStage;
         if (planet.currentLevel % 10 === 0) {
@@ -306,6 +407,8 @@ const setAdminCrit = (c) => {
     db.query(`UPDATE game JOIN users ON game.user_id = users.id SET critchance = ? WHERE users.id = ?`, 
     [c, userId], (err, data) => {
         if (err) throw err;
+        console.log(data);
+        console.log(`adminCrit userId: ${userId}`);
     });
 }
 
@@ -365,6 +468,11 @@ module.exports = {
                 });
             }) */
 
+            socket.on('senddps', () => {
+
+                socket.emit('receivesenddps', {gameState: gameState});
+            })
+
             socket.on('sendclick', () => {
                 hitPlanet();
                 socket.emit('receiveclick', {gameState: gameState, reset: reset, isCritical: isCritical, crit: crit});
@@ -396,6 +504,14 @@ module.exports = {
                 buyItem(data.name, data.id);
 
                 socket.emit('receivebuyitem', {gameState: gameState, name: data.name});
+            });
+
+            socket.on('buyship', (data) => {
+
+
+                buyShip(data.name, data.id);
+
+                socket.emit('receivebuyship', {gameState: gameState, name: data.name});
             });
 
             socket.on('spin', () => {

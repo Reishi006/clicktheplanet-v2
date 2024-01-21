@@ -10,15 +10,27 @@ const insertGame = `INSERT INTO game
 (id, user_id, gold, diamonds, currentlevel, maxlevel, currentstage, maxstage, currenthp, maxhp, currentdamage, totaldamage, critchance, guild_id) 
 SELECT NULL, MAX(id), '100', '100', '1', '1', '0', '0', '10', '10', '1', '0', '0.01', NULL FROM users`;
 const insertItems = `INSERT INTO users_items (id, user_id, item_id, level, cost, damage, locked) 
-VALUES (NULL, (SELECT MAX(id) FROM users), '1', '0', '100', '1', '0');
+VALUES (NULL, (SELECT MAX(id) FROM users), '1', '0', '100', '0', '0');
 INSERT INTO users_items (id, user_id, item_id, level, cost, damage, locked) 
-VALUES (NULL, (SELECT MAX(id) FROM users), '2', '0', '1000', '10', '1');
+VALUES (NULL, (SELECT MAX(id) FROM users), '2', '0', '1000', '0', '1');
 INSERT INTO users_items (id, user_id, item_id, level, cost, damage, locked) 
-VALUES (NULL, (SELECT MAX(id) FROM users), '3', '0', '2500', '100', '1');`;
+VALUES (NULL, (SELECT MAX(id) FROM users), '3', '0', '2500', '0', '1');`;
+const insertShip = `INSERT INTO users_ship (id, user_id, ship_id, level, cost, multiplier) VALUES
+(NULL, (SELECT MAX(id) FROM users), 1, '0', '1000', '0.01');
+INSERT INTO users_ship (id, user_id, ship_id, level, cost, multiplier) VALUES
+(NULL, (SELECT MAX(id) FROM users), 2, '0', '10000', '1.00');
+INSERT INTO users_ship (id, user_id, ship_id, level, cost, multiplier) VALUES
+(NULL, (SELECT MAX(id) FROM users), 3, '0', '50000', '1.00');
+INSERT INTO users_ship (id, user_id, ship_id, level, cost, multiplier) VALUES
+(NULL, (SELECT MAX(id) FROM users), 4, '0', '50000', '1.00');`;
 const maxGameId = `SELECT MAX(id) AS last_id FROM game`;
 const registerQuery = `INSERT INTO users VALUES (NULL, ?, ?, ?, '0', '0')`;
 const loginQuery = `SELECT * FROM users WHERE login = ?`;
 const checkUser = `SELECT * FROM users WHERE email = ? OR login = ?`;
+const removeAll = `DELETE FROM users_items WHERE user_id = ?;
+DELETE FROM users_ship WHERE user_id = ?;
+DELETE FROM game WHERE user_id = ?;
+DELETE FROM users WHERE id = ?`;
 const getMessages = `SELECT DISTINCT m.id, m.user, m.message, m.date_sent, m.guild_id, u.login 
 FROM messages AS m 
 JOIN users AS u ON u.id = m.user 
@@ -79,48 +91,127 @@ JOIN game ON users.id = game.user_id
 JOIN users_items ON users.id = users_items.user_id
 WHERE users.id = ?`;
 
+let queryShip = `SELECT * FROM users
+JOIN users_ship ON users.id = users_ship.user_id
+WHERE users.id = ?`;
+
 const initialFetch = (playerid, res) => {
     db.query(queryAll, playerid, (err, data) => {
         if (err) return res.status(500).json(err);
         //console.log(data[0].login);
 
-        gameState.player.gold = Number(data[0].gold);
-        gameState.player.diamonds = Number(data[0].diamonds);
+        const { player, planet, items, ship } = gameState;
+
+        player.gold = Number(data[0].gold);
+        player.diamonds = Number(data[0].diamonds);
         
-        //gameState.player.critChance
-        gameState.player.currentDamage = Number(data[0].currentdamage);
-        gameState.player.totalDamage = Number(data[0].totaldamage);
-        gameState.player.critChance = Number(data[0].critchance);
-        console.log(`critChance: ${gameState.player.critChance}`);
+        //player.critChance
+        player.currentDamage = Number(data[0].currentdamage);
+        player.totalDamage = Number(data[0].totaldamage);
+        player.critChance = Number(data[0].critchance);
+        console.log(`critChance: ${player.critChance}`);
 
 
-        gameState.planet.currentLevel = Number(data[0].currentlevel);
-        gameState.planet.maxLevel = Number(data[0].maxlevel);
-        gameState.planet.currentStage = data[0].currentstage;
-        gameState.planet.maxStage = data[0].maxstage;
+        planet.currentLevel = Number(data[0].currentlevel);
+        planet.maxLevel = Number(data[0].maxlevel);
+        planet.currentStage = data[0].currentstage;
+        planet.maxStage = data[0].maxstage;
 
-        gameState.planet.maxHp = data[0].maxhp;
-        gameState.planet.currentHp = gameState.planet.maxHp;
+        planet.maxHp = data[0].maxhp;
+        planet.currentHp = planet.maxHp;
         //set hp onload to prevent the object defaults
 
 
-        gameState.items.blueLaserGun.level = Number(data[0].level);
-        gameState.items.blueLaserGun.cost = Number(data[0].cost);
-        gameState.items.blueLaserGun.damage = Number(data[0].damage);
-        gameState.items.blueLaserGun.damage = data[0].locked;
-        gameState.items.greenLaserGun.level = Number(data[1].level);
-        gameState.items.greenLaserGun.cost = Number(data[1].cost);
-        gameState.items.greenLaserGun.damage = Number(data[1].damage);
-        gameState.items.blueLaserGun.damage = data[1].locked;
-        gameState.items.redLaserGun.level = Number(data[2].level);
-        gameState.items.redLaserGun.cost = Number(data[2].cost);
-        gameState.items.redLaserGun.damage = Number(data[2].damage);
-        gameState.items.blueLaserGun.damage = data[2].locked;
+        items.blueLaserGun.level = Number(data[0].level);
+        items.blueLaserGun.cost = Number(data[0].cost);
+        items.blueLaserGun.damage = Number(data[0].damage);
+        items.blueLaserGun.damage = data[0].locked;
+        items.greenLaserGun.level = Number(data[1].level);
+        items.greenLaserGun.cost = Number(data[1].cost);
+        items.greenLaserGun.damage = Number(data[1].damage);
+        items.blueLaserGun.damage = data[1].locked;
+        items.redLaserGun.level = Number(data[2].level);
+        items.redLaserGun.cost = Number(data[2].cost);
+        items.redLaserGun.damage = Number(data[2].damage);
+        items.blueLaserGun.damage = data[2].locked;
 
-        console.log(`initialFetch: maxStage: ${gameState.planet.maxStage}`);
-        console.log(`initialFetch: currentStage: ${gameState.planet.currentStage}`);
+        console.log(`initialFetch: maxStage: ${planet.maxStage}`);
+        console.log(`initialFetch: currentStage: ${planet.currentStage}`);
 
-        return res.json({
+        db.query(queryShip, playerid, (err, data) => {
+            if (err) return res.status(500).json(err);
+
+
+            ship.dps.level = Number(data[0].level);
+            ship.dps.cost = Number(data[0].cost);
+            ship.dps.multiplier = Number(data[0].multiplier);
+            ship.damageDealt.level = Number(data[1].level);
+            ship.damageDealt.cost = Number(data[1].cost);
+            ship.damageDealt.multiplier = Number(data[1].multiplier);
+            ship.critChance.level = Number(data[2].level);
+            ship.critChance.cost = Number(data[2].cost);
+            ship.critChance.multiplier = Number(data[2].multiplier);
+            ship.gold.level = Number(data[3].level);
+            ship.gold.cost = Number(data[3].cost);
+            ship.gold.multiplier = Number(data[3].multiplier);
+
+            return res.json({
+                login: data[0].login, admin: data[0].admin,
+                gold: player.gold,
+                diamonds: player.diamonds,
+
+                currentdamage: player.currentDamage,
+                totaldamage: player.totalDamage,
+                critchance: player.critChance,
+
+                currentlevel: planet.currentLevel,
+                maxlevel: planet.maxLevel,
+                currentstage: planet.currentStage,
+                maxstage: planet.maxStage,
+
+                currenthp: planet.currentHp,
+                maxhp: planet.maxHp,
+
+                bluelasergun: {
+                    level: items.blueLaserGun.level,
+                    cost: items.blueLaserGun.cost,
+                    damage: items.blueLaserGun.damage,
+                },
+                greenlasergun: {
+                    level: items.greenLaserGun.level,
+                    cost: items.greenLaserGun.cost,
+                    damage: items.greenLaserGun.damage,
+                },
+                redlasergun: {
+                    level: items.redLaserGun.level,
+                    cost: items.redLaserGun.cost,
+                    damage: items.redLaserGun.damage,
+                },
+
+                ship_dps: {
+                    level: ship.dps.level,
+                    cost: ship.dps.cost,
+                    multiplier: ship.dps.multiplier,
+                },
+                ship_damage: {
+                    level: ship.damageDealt.level,
+                    cost: ship.damageDealt.cost,
+                    multiplier: ship.damageDealt.multiplier,
+                },
+                ship_crit: {
+                    level: ship.critChance.level,
+                    cost: ship.critChance.cost,
+                    multiplier: ship.critChance.multiplier,
+                },
+                ship_gold: {
+                    level: ship.gold.level,
+                    cost: ship.gold.cost,
+                    multiplier: ship.gold.multiplier,
+                },
+            });
+        });
+
+        /* return res.json({
             login: data[0].login, admin: data[0].admin,
             gold: data[0].gold,
             diamonds: data[0].diamonds,
@@ -155,7 +246,7 @@ const initialFetch = (playerid, res) => {
                 damage: data[2].damage,
                 locked: data[2].locked,
             },
-        });
+        }); */
     });
 }
 
@@ -184,6 +275,14 @@ const registerHandler = async (req, res) => {
                 
                 db.query(insertItems, (err, data) => {
                     console.log(`inside insertItems`);
+                    if (err) return res.status(500).json(`gameInsert err: ${err}`);
+                    //else return res.status(201).json('Game data inserted!');
+
+                });
+
+
+                db.query(insertShip, (err, data) => {
+                    console.log(`inside insertShip`);
                     if (err) return res.status(500).json(`gameInsert err: ${err}`);
                     else return res.status(201).json('Game data inserted!');
 
@@ -327,6 +426,14 @@ router.post('/logout', (req, res) => {
         sameSite:"none",
         secure:true
     }).sendStatus(200);
+});
+
+router.post('/remove', checkAuth, (req, res) => {
+    db.query(removeAll, [req.id, req.id, req.id, req.id], (err, data) => {
+        if (err) throw err;
+        res.sendStatus(200);
+    });
+    //res.sendStatus(200);
 });
 
 module.exports = router;
