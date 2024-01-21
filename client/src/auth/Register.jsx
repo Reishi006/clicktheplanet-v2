@@ -33,13 +33,13 @@ function Register() {
 
   const handleInput = (e) => {
     setFormValue({...formValue, [e.target.name]: e.target.value});
-    console.log({...formValue, [e.target.name]: e.target.value});
+    //console.log({...formValue, [e.target.name]: e.target.value});
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formValue.email);
-    console.log('Submit:'+ {formValue});
+    //console.log(formValue.email);
+    //console.log('Submit:'+ {formValue});
     try {
       const res = await axios.post('/routes/register', formValue);
         console.log(res.data)
@@ -62,11 +62,11 @@ function Register() {
           </div>
           <div className='input-container'>
             <div className="fas fa-user user"></div>
-            <input type='text' name='login' placeholder='Enter your login'  value={formValue.login} onChange={handleInput} required></input>
+            <input type='text' name='login' placeholder='Enter your login'  value={formValue.login} minLength='3' onChange={handleInput} required></input>
           </div>
           <div className='input-container'>
             <div className="fas fa-lock password"></div>
-            <input type='password' name='password' placeholder='Enter your password' value={formValue.password} onChange={handleInput} required></input>
+            <input type='password' name='password' placeholder='Enter your password' value={formValue.password} minLength='6' onChange={handleInput} required></input>
           </div>
           <button type='submit' className='submit-btn' name='submit'>Register</button>
         </form>

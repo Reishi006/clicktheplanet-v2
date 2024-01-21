@@ -52,8 +52,14 @@ export default function AdminPanel({ playerState, setPlayerState, planetState, s
 
         socket.once('receivesetlevel', (data) => {
           console.log(data.gameState.planet.currentLevel);
-          setPlayerState({...planetState, 
-            currentLevel: data.gameState.planet.currentLevel});
+          setPlanetState({...planetState, 
+            currentHp: data.gameState.planet.currentHp,
+            maxHp: data.gameState.planet.maxHp,
+            currentLevel: data.gameState.planet.currentLevel,
+            maxLevel: data.gameState.planet.maxLevel,
+            currentStage: data.gameState.planet.currentStage,
+            
+        });
         });
     }
 
@@ -65,9 +71,14 @@ export default function AdminPanel({ playerState, setPlayerState, planetState, s
         socket.emit('setstage', stage);
 
         socket.once('receivesetstage', (data) => {
-          console.log(data.gameState.planet.currentStage);
-          setPlanetState({...planetState, 
-            currentStage: data.gameState.planet.currentStage});
+            console.log(data.gameState.planet.currentStage);
+            setPlanetState({...planetState, 
+                currentHp: data.gameState.planet.currentHp,
+                maxHp: data.gameState.planet.maxHp,
+                currentLevel: data.gameState.planet.currentLevel,
+                maxLevel: data.gameState.planet.maxLevel,
+                currentStage: data.gameState.planet.currentStage,
+            });
         });
     }
 

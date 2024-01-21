@@ -8,7 +8,7 @@ import {
   planet1, planet2, planet3, planet4, planet5,
   planetboss1, planetboss2, planetboss3, planetboss4, planetboss5,
   /* laserGunBlue, laserGunGreen, laserGunRed, */
-  store, ship, stats, guild, wheel, admin,
+  store, ship, stats, guild, wheel,
   hitGrad,
   skipArrowLeft, skipArrowRight,
 } from '../assets/img-import.js';
@@ -21,6 +21,7 @@ import Planet from '../components/Planet';
 import AdminPanel from '../components/AdminPanel';
 import Drawer from '../components/Drawer';
 import DrawerAdmin from '../components/DrawerAdmin';
+import Profile from '../components/Profile';
 import Settings from '../components/Settings';
 import Notifications from '../components/Notifications';
 import extractStatus from '../auth/Register';
@@ -44,6 +45,7 @@ function Main() {
   const [display, setDisplay] = useState({
     settings: false,
     notifications: false,
+    profile: false,
   });
   const [coords, setCoords] = useState({x: 0, y: 0});
   const [randomPlanet, setPlanet] = useState();
@@ -55,7 +57,7 @@ function Main() {
     gold: 100,
     diamonds: 100,
     currentDamage: 1,
-    critChance: 0.1,
+    critChance: 0.01,
     totalDamage: 0,
 
     crit: 0,
@@ -98,6 +100,36 @@ function Main() {
       locked: true,
     },
   });
+  const [shipState, setShipState] = useState({
+    dps: {
+      level: 0,
+      cost: 1000,
+      multiplier: 0.01,
+    },
+    damageDealt: {
+        level: 0,
+        cost: 10000,
+        multiplier: 1.00,
+    },
+    critChance: {
+        level: 0,
+        cost: 50000,
+        multiplier: 1.00,
+    },
+    gold: {
+        level: 0,
+        cost: 50000,
+        multiplier: 1.00,
+    }
+  });
+
+  const [prof, setProf] = useState(0);
+
+
+  const [allAnim, setAllAnim] = useState(true);
+  const [hitAnim, setHitAnim] = useState(true);
+  const [dmgAnim, setDmgAnim] = useState(true);
+  const [planetAnim, setPlanetAnim] = useState(true);
 
   const [position, setPosition] = useState({ top: 0, left: 0 }); //diamond position;
   const [visible, setVisible] = useState(true);
@@ -106,7 +138,6 @@ function Main() {
   const [planetScale, setPlanetScale] = useState(0.5);
 
   const [spin, setSpin] = useState(0);
-  const [isClicked, setIsClicked] = useState(false);
 
   /* const [isChecked, setIsChecked] = useState({
     option1: false,
@@ -114,12 +145,52 @@ function Main() {
     option3: false,
   }); */
 
+  let profile_img = [user_prof1, user_prof2, user_prof3, user_prof4, user_prof5];
+
   const openChat = () => {
     socket.emit('openchat', 'i want chat opened');
     socket.once('receivechat', (data) => {
       console.log(data);
     });
   }
+
+  const toggleAllAnim = () => {
+    if (allAnim === false) {
+      setAllAnim(true);
+      setHitAnim(true);
+      setDmgAnim(true);
+      setPlanetAnim(true);
+    }
+    else {
+      setAllAnim(false);
+      setHitAnim(false);
+      setDmgAnim(false);
+      setPlanetAnim(false);
+    }
+    console.log(`toggleAllAnim`);
+  }
+
+  const toggleHitAnim = () => {
+    if (hitAnim === false) setHitAnim(true);
+    else setHitAnim(false);
+    console.log(`toggleHitAnim`);
+  }
+
+  const toggleDmgAnim = () => {
+    if (dmgAnim === false) setDmgAnim(true);
+    else setDmgAnim(false);
+    console.log(`toggleDmgAnim`);
+  }
+
+  const togglePlanetAnim = () => {
+    if (planetAnim === false) setPlanetAnim(true);
+    else setPlanetAnim(false);
+    console.log(`togglePlanetAnim`);
+  }
+
+  useEffect(() => {
+    console.log(`animations: ${allAnim}, ${hitAnim}, ${dmgAnim}, ${planetAnim}`);
+  }, [allAnim, hitAnim, dmgAnim, planetAnim]);
 
   const planets = [planet1, planet2, planet3, planet4, planet5];
   const planetsBosses = [planetboss1, planetboss2, planetboss3, planetboss4, planetboss5];
@@ -161,11 +232,9 @@ function Main() {
       });
     });
   
-    // Generate random times
-    const maxTime = 20000; // Maximum time in milliseconds
+    const maxTime = 20000;
     const time = Math.floor(Math.random() * maxTime) + 10000;
   
-    // Schedule the object to appear again
     timerRef.current = setTimeout(() => {
       setVisible(true);
       moveObject();
@@ -175,19 +244,16 @@ function Main() {
    };
 
    const moveObject = () => {
-    // Generate random positions
-    const maxLeft = window.innerWidth - 100; // Assuming the object is 100px wide
-    const maxTop = window.innerHeight - 100; // Assuming the object is 100px tall
+    const maxLeft = window.innerWidth - 100;
+    const maxTop = window.innerHeight - 100;
     const leftPos = Math.floor(Math.random() * (maxLeft + 1));
     const topPos = Math.floor(Math.random() * (maxTop + 1));
    
-    // Update the state with the new position
     setPosition({ top: topPos, left: leftPos });
     };
    
     useEffect(() => {
     setVisible(false);
-    // Move the object immediately when the component mounts
     const maxTime = 10000;
     const time = Math.floor(Math.random() * maxTime) + 10000;
     setTimeout(() => {
@@ -195,26 +261,21 @@ function Main() {
     }, time);
     moveObject();
    
-    // Clean up on unmount
     return () => clearTimeout(timerRef.current);
     }, []);
 
     const handleResize = () => {
-      // Generate random positions
-      const maxLeft = window.innerWidth - 100; // Assuming the object is 100px wide
-      const maxTop = window.innerHeight - 100; // Assuming the object is 100px tall
-      const leftPos = Math.abs(position.left - maxLeft + 1);
-      const topPos = Math.abs(position.top - maxTop + 1);
+      const maxLeft = window.innerWidth - 100;
+      const maxTop = window.innerHeight - 100;
+      const leftPos = Math.abs(maxLeft/2);
+      const topPos = Math.abs(maxTop/2);
      
-      // Update the state with the new position
       setPosition({ top: topPos, left: leftPos });
     }
 
     useEffect(() => {
-      // Add the resize event listener
       window.addEventListener('resize', handleResize);
      
-      // Clean up on unmount
       return () => window.removeEventListener('resize', handleResize);
      }, []);
 
@@ -231,6 +292,7 @@ function Main() {
   const generatePlanetName = () => {
     let genName = `1${planetState.currentLevel}-${namePlanet[0]}${namePlanet[(planetState.currentLevel-1)%26]}${namePlanet[planetState.currentStage]}`;
     setPlanetState({...planetState, name: genName});
+    console.log(`planetName generated; genName: ${genName}`);
   }
 
   useEffect(() => {
@@ -297,7 +359,8 @@ function Main() {
 
   const resetPlanet = (s, bool) => {
       //NOT BOSS
-      setPlanetScale(s);
+      planetAnim && setPlanetScale(s);
+      
 
       if (bool) {
         setTimeout(() => {
@@ -323,6 +386,38 @@ function Main() {
     generatePlanetName();
   }, [planetState.currentStage, planetState.currentLevel]);
 
+  const handleDps = () => {
+      socket.emit('senddps', 'dps sent');
+    
+      socket.once('receivesenddps', function(data) {
+        setPlanetState({...planetState, 
+          currentHp: data.gameState.planet.currentHp,
+          maxHp: data.gameState.planet.maxHp,
+          currentLevel: data.gameState.planet.currentLevel,
+          maxLevel: data.gameState.planet.maxLevel,
+          currentStage: data.gameState.planet.currentStage,
+          maxStage: data.gameState.planet.maxStage,
+        });
+
+        setPlayerState(playerState => ({...playerState,
+          gold: data.gameState.player.gold,
+          currentDamage: data.gameState.player.currentDamage,
+          totalDamage: data.gameState.player.totalDamage,
+        }));
+      });
+
+  }
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (shipState.dps.level >= 1) {
+        handleDps();
+        console.log('DPS interval');
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [socket, shipState.dps.level]);
+
   const handlePlanet = () => {
       socket.emit('sendclick', 'User clicked');
 
@@ -345,11 +440,12 @@ function Main() {
         setPlayerState(playerState => ({...playerState,
           gold: data.gameState.player.gold,
           currentDamage: data.gameState.player.currentDamage,
+          totalDamage: data.gameState.player.totalDamage,
         }));
       });
 
-      displayDamageOverlay();
-      displayHitSvg();
+      dmgAnim && displayDamageOverlay();
+      hitAnim && displayHitSvg();
 
       //console.log('from react handlePlanet: '+planetState.currentLevel);
   }
@@ -425,7 +521,26 @@ function Main() {
     });
   }
 
-  const handleSpin = (e) => {
+  const buyShip = (name, id) => {
+    console.log(`buyship ${name}`);
+    socket.emit('buyship', {name, id});
+
+    socket.once('receivebuyship', function(data) {
+      setPlayerState({...playerState,
+        gold: data.gameState.player.gold,
+        currentDamage: data.gameState.player.currentDamage,
+      });
+      setShipState({...shipState,
+        [data.name]: {
+          level: data['gameState']['ship'][data.name]['level'],
+          cost: data['gameState']['ship'][data.name]['cost'],
+          multiplier: data['gameState']['ship'][data.name]['multiplier'],
+        },
+      })
+    });
+  }
+
+  /* const handleSpin = (e) => {
   
   setIsClicked(true);
   setSpin(0);
@@ -444,13 +559,13 @@ function Main() {
         });
       }, 0)
     }
-    /* setTimeout(() => {
+    setTimeout(() => {
       setSpin(0);
-    }, 5000); */
+    }, 5000);
   }
 
   useEffect(() => {
-  }, [spin]);
+  }, [spin]); */
 
   const getData = () => {
 
@@ -534,6 +649,18 @@ function Main() {
     }
   }
 
+  const toggleProfile = () => {
+    if (display.profile === true) {
+      setDisplay(display => ({...display,
+        profile: false,
+      }));
+    } else {
+      setDisplay(display => ({...display,
+        profile: true,
+      }));
+    }
+  }
+
   const toggleSettings = () => {
     if (display.settings === true) {
       setDisplay(display => ({...display,
@@ -560,8 +687,6 @@ function Main() {
   const options = [<Store itemState={itemState} buyItem={buyItem}/>, 
   <Ship/>, 
   <Stats playerState={playerState} planetState={planetState}/>, 
-  <Guild/>, 
-  <Wheel handleSpin={handleSpin} spin={spin}/>,
   <AdminPanel 
   playerState={playerState} setPlayerState={setPlayerState}
   planetState={planetState} setPlanetState={setPlanetState}
@@ -572,70 +697,80 @@ function Main() {
     <>
       <div className='game-container'>
 
-        {visible && <img onClick={handleDiamond} className='click-diamond' style={{ top: `${position.top}px`, left: `${position.left}px` }} src={diamond}></img>}
+      {visible && <img onClick={handleDiamond} className='click-diamond' style={{ top: `${position.top}px`, left: `${position.left}px` }} src={diamond}></img>}
 
-        <div className='navbar-container'>
-          <div className='navbar-left'>
-            <div><img src={scaled_logo} className='navbar-logo' alt='logo'></img></div>
-          </div>
-          <div className='navbar-right'>
-            <div className='navbar-profile-container'>
-              <div>ADMIN: </div>
-              <div className='navbar-profile-nickname'>{userLogin}</div>
-              <img className='navbar-profile-logo' src={user_prof1} alt='user-logo'></img>
-            </div>
-            <div className='navbar-bell-container'>
-              <img className='navbar-bell' onClick={toggleNotifications} src={bell} alt='notifications'></img>
-              <div className='navbar-bell-notification'>1</div>
-              {display.notifications && <Notifications toggleNotifications={toggleNotifications}></Notifications>}
-            </div>
-            <img src={settings} onClick={toggleSettings} alt='settings'></img>
-            <form method='post' onSubmit={handleLogout}><button type='submit' name='submit'>Logout</button></form>
-          </div>
-          <div className='navbar-burger'>
-            <div>Burgir</div>
-          </div>
+      <div className='navbar-container'>
+        <div className='navbar-left'>
+          <div><img src={scaled_logo} className='navbar-logo' alt='logo'></img></div>
         </div>
+        <div className='navbar-right'>
+          <div className='navbar-profile-container'>
+            <div className='navbar-profile-nickname'>{userLogin}</div>
+            <img className='navbar-profile-logo' src={user_prof1} alt='user-logo'></img>
+          </div>
+          {/* <div className='navbar-bell-container'>
+            <img className='navbar-bell' onClick={toggleNotifications} src={bell} alt='notifications'></img>
+            <div className='navbar-bell-notification'>1</div>
+            {display.notifications && <Notifications toggleNotifications={toggleNotifications}></Notifications>}
+          </div> */}
+          <img src={settings} className='navbar-settings-icon' onClick={toggleSettings} alt='settings'></img>
+          <form method='post' className='navbar-logout' onSubmit={handleLogout}><button type='submit' name='submit'>Logout</button></form>
+        </div>
+        {/* <div className='navbar-burger'>
+          <div>One div</div>
+          <div>Or another</div>
+        </div> */}
+      </div>
 
-        {display.settings && <Settings toggleSettings={toggleSettings}></Settings>}
-        
-        <div className='main-container'>
-          {/* <h1>Welcome to Main.jsx!</h1>
-          <h2 className='error'>Error?:{errData}</h2> */}
+      {display.settings && <Settings 
+      toggleSettings={toggleSettings}
+      toggleAllAnim={toggleAllAnim}
+      toggleHitAnim={toggleHitAnim}
+      toggleDmgAnim={toggleDmgAnim}
+      togglePlanetAnim={togglePlanetAnim}
+      allAnim={allAnim}
+      hitAnim={hitAnim}
+      dmgAnim={dmgAnim}
+      planetAnim={planetAnim}
+      ></Settings>}
 
-          <div className='main-left'>
+      <div className='main-container'>
+        {/* <h1>Welcome to Main.jsx!</h1>
+        <h2 className='error'>Error?:{errData}</h2> */}
 
-              <DrawerAdmin openChat={openChat} setShow={setShow}></DrawerAdmin>
+        <div className='main-left'>
 
-              <div className='main-content-container'>
-                <div className='money-display'>
-                  <div className='money-container'><img src={gold} className='money-logo' alt='gold'></img> {playerState.gold}</div>
-                  <div className='money-container'><img src={diamond} className='money-logo' alt='diamond'></img> {playerState.diamonds}</div>
-                </div>
-                {options[show]}
+            <DrawerAdmin openChat={openChat} setShow={setShow}></DrawerAdmin>
+
+            <div className='main-content-container'>
+              <div className='money-display'>
+                <div className='money-container'><img src={gold} className='money-logo' alt='gold'></img> {playerState.gold}</div>
+                <div className='money-container'><img src={diamond} className='money-logo' alt='diamond'></img> {playerState.diamonds}</div>
               </div>
+              {options[show]}
+            </div>
 
-          </div>
-          
-          <div className='main-right'>
-            <Planet
-              damageDisplayRef={damageDisplayRef}
-
-              randColor={randColor}
-              planets={planets}
-              planetsBosses={planetsBosses}
-              randomPlanet={randomPlanet}
-              handlePlanet={handlePlanet}
-              handleArrowLeft={handleArrowLeft}
-              skipArrowLeft={skipArrowLeft}
-              handleArrowRight={handleArrowRight}
-              skipArrowRight={skipArrowRight}
-              planetState={planetState}
-              setPlanetState={setPlanetState}
-              planetScale={planetScale}
-            ></Planet>
-          </div>
         </div>
+        
+        <div className='main-right'>
+          <Planet
+            damageDisplayRef={damageDisplayRef}
+
+            randColor={randColor}
+            planets={planets}
+            planetsBosses={planetsBosses}
+            randomPlanet={randomPlanet}
+            handlePlanet={handlePlanet}
+            handleArrowLeft={handleArrowLeft}
+            skipArrowLeft={skipArrowLeft}
+            handleArrowRight={handleArrowRight}
+            skipArrowRight={skipArrowRight}
+            planetState={planetState}
+            setPlanetState={setPlanetState}
+            planetScale={planetScale}
+          ></Planet>
+        </div>
+      </div>
 
       </div>
     </>

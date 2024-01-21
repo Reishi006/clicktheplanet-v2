@@ -19,6 +19,7 @@ import Guild from '../components/Guild';
 import Wheel from '../components/Wheel';
 import Planet from '../components/Planet';
 import Drawer from '../components/Drawer';
+import Profile from '../components/Profile';
 import Settings from '../components/Settings';
 import Notifications from '../components/Notifications';
 import extractStatus from '../auth/Register';
@@ -42,6 +43,7 @@ function Main() {
   const [display, setDisplay] = useState({
     settings: false,
     notifications: false,
+    profile: false,
   });
   const [coords, setCoords] = useState({x: 0, y: 0});
   const [randomPlanet, setPlanet] = useState();
@@ -53,7 +55,7 @@ function Main() {
     gold: 100,
     diamonds: 100,
     currentDamage: 1,
-    critChance: 0.1,
+    critChance: 0.01,
     totalDamage: 0,
 
     crit: 0,
@@ -96,6 +98,31 @@ function Main() {
       locked: true,
     },
   });
+  const [shipState, setShipState] = useState({
+    dps: {
+      level: 0,
+      cost: 1000,
+      multiplier: 0.01,
+    },
+    damageDealt: {
+        level: 0,
+        cost: 10000,
+        multiplier: 1.00,
+    },
+    critChance: {
+        level: 0,
+        cost: 50000,
+        multiplier: 1.00,
+    },
+    gold: {
+        level: 0,
+        cost: 50000,
+        multiplier: 1.00,
+    }
+  });
+
+  const [prof, setProf] = useState(0);
+
 
   const [allAnim, setAllAnim] = useState(true);
   const [hitAnim, setHitAnim] = useState(true);
@@ -115,6 +142,8 @@ function Main() {
     option2: false,
     option3: false,
   }); */
+
+  let profile_img = [user_prof1, user_prof2, user_prof3, user_prof4, user_prof5];
 
   const openChat = () => {
     socket.emit('openchat', 'i want chat opened');
@@ -201,11 +230,9 @@ function Main() {
       });
     });
   
-    // Generate random times
-    const maxTime = 20000; // Maximum time in milliseconds
+    const maxTime = 20000;
     const time = Math.floor(Math.random() * maxTime) + 10000;
   
-    // Schedule the object to appear again
     timerRef.current = setTimeout(() => {
       setVisible(true);
       moveObject();
@@ -215,19 +242,16 @@ function Main() {
    };
 
    const moveObject = () => {
-    // Generate random positions
-    const maxLeft = window.innerWidth - 100; // Assuming the object is 100px wide
-    const maxTop = window.innerHeight - 100; // Assuming the object is 100px tall
+    const maxLeft = window.innerWidth - 100;
+    const maxTop = window.innerHeight - 100;
     const leftPos = Math.floor(Math.random() * (maxLeft + 1));
     const topPos = Math.floor(Math.random() * (maxTop + 1));
    
-    // Update the state with the new position
     setPosition({ top: topPos, left: leftPos });
     };
    
     useEffect(() => {
     setVisible(false);
-    // Move the object immediately when the component mounts
     const maxTime = 10000;
     const time = Math.floor(Math.random() * maxTime) + 10000;
     setTimeout(() => {
@@ -235,26 +259,21 @@ function Main() {
     }, time);
     moveObject();
    
-    // Clean up on unmount
     return () => clearTimeout(timerRef.current);
     }, []);
 
     const handleResize = () => {
-      // Generate random positions
-      const maxLeft = window.innerWidth - 100; // Assuming the object is 100px wide
-      const maxTop = window.innerHeight - 100; // Assuming the object is 100px tall
-      const leftPos = Math.abs(position.left - maxLeft + 1);
-      const topPos = Math.abs(position.top - maxTop + 1);
+      const maxLeft = window.innerWidth - 100;
+      const maxTop = window.innerHeight - 100;
+      const leftPos = Math.abs(maxLeft/2);
+      const topPos = Math.abs(maxTop/2);
      
-      // Update the state with the new position
       setPosition({ top: topPos, left: leftPos });
     }
 
     useEffect(() => {
-      // Add the resize event listener
       window.addEventListener('resize', handleResize);
      
-      // Clean up on unmount
       return () => window.removeEventListener('resize', handleResize);
      }, []);
 
@@ -365,6 +384,38 @@ function Main() {
     generatePlanetName();
   }, [planetState.currentStage, planetState.currentLevel]);
 
+  const handleDps = () => {
+      socket.emit('senddps', 'dps sent');
+    
+      socket.once('receivesenddps', function(data) {
+        setPlanetState({...planetState, 
+          currentHp: data.gameState.planet.currentHp,
+          maxHp: data.gameState.planet.maxHp,
+          currentLevel: data.gameState.planet.currentLevel,
+          maxLevel: data.gameState.planet.maxLevel,
+          currentStage: data.gameState.planet.currentStage,
+          maxStage: data.gameState.planet.maxStage,
+        });
+
+        setPlayerState(playerState => ({...playerState,
+          gold: data.gameState.player.gold,
+          currentDamage: data.gameState.player.currentDamage,
+          totalDamage: data.gameState.player.totalDamage,
+        }));
+      });
+
+  }
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (shipState.dps.level >= 1) {
+        handleDps();
+        console.log('DPS interval');
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [socket, shipState.dps.level]);
+
   const handlePlanet = () => {
       socket.emit('sendclick', 'User clicked');
 
@@ -387,6 +438,7 @@ function Main() {
         setPlayerState(playerState => ({...playerState,
           gold: data.gameState.player.gold,
           currentDamage: data.gameState.player.currentDamage,
+          totalDamage: data.gameState.player.totalDamage,
         }));
       });
 
@@ -462,6 +514,25 @@ function Main() {
           level: data['gameState']['items'][data.name]['level'],
           cost: data['gameState']['items'][data.name]['cost'],
           damage: data['gameState']['items'][data.name]['damage'],
+        },
+      })
+    });
+  }
+
+  const buyShip = (name, id) => {
+    console.log(`buyship ${name}`);
+    socket.emit('buyship', {name, id});
+
+    socket.once('receivebuyship', function(data) {
+      setPlayerState({...playerState,
+        gold: data.gameState.player.gold,
+        currentDamage: data.gameState.player.currentDamage,
+      });
+      setShipState({...shipState,
+        [data.name]: {
+          level: data['gameState']['ship'][data.name]['level'],
+          cost: data['gameState']['ship'][data.name]['cost'],
+          multiplier: data['gameState']['ship'][data.name]['multiplier'],
         },
       })
     });
@@ -545,6 +616,28 @@ function Main() {
           locked: res.data.redlasergun.locked,
         },
       });
+      setShipState({...shipState,
+        dps: {
+          level: res.data.ship_dps.level,
+          cost: res.data.ship_dps.cost,
+          multiplier: res.data.ship_dps.multiplier,
+        },
+        damageDealt: {
+          level: res.data.ship_damage.level,
+          cost: res.data.ship_damage.cost,
+          multiplier: res.data.ship_damage.multiplier,
+        },
+        critChance: {
+          level: res.data.ship_crit.level,
+          cost: res.data.ship_crit.cost,
+          multiplier: res.data.ship_crit.multiplier,
+        },
+        gold: {
+          level: res.data.ship_gold.level,
+          cost: res.data.ship_gold.cost,
+          multiplier: res.data.ship_gold.multiplier,
+        },
+      });
 
       const newSocket = io(`http://localhost:8000`);
       setSocket(newSocket);
@@ -582,6 +675,18 @@ function Main() {
     }
   }
 
+  const toggleProfile = () => {
+    if (display.profile === true) {
+      setDisplay(display => ({...display,
+        profile: false,
+      }));
+    } else {
+      setDisplay(display => ({...display,
+        profile: true,
+      }));
+    }
+  }
+
   const toggleSettings = () => {
     if (display.settings === true) {
       setDisplay(display => ({...display,
@@ -606,10 +711,9 @@ function Main() {
     }
   }
   const options = [<Store itemState={itemState} buyItem={buyItem}/>, 
-  <Ship/>, 
-  <Stats playerState={playerState} planetState={planetState}/>, 
-  <Guild/>, 
-  <Wheel /* handleSpin={handleSpin} */ spin={spin}/>];
+  <Ship shipState={shipState} buyShip={buyShip}/>, 
+  <Stats playerState={playerState} planetState={planetState}/>,
+];
 
   return (
     <>
@@ -624,7 +728,7 @@ function Main() {
           <div className='navbar-right'>
             <div className='navbar-profile-container'>
               <div className='navbar-profile-nickname'>{userLogin}</div>
-              <img className='navbar-profile-logo' src={user_prof1} alt='user-logo'></img>
+              <img className='navbar-profile-logo' onClick={toggleProfile} src={profile_img[prof]} alt='user-logo'></img>
             </div>
             {/* <div className='navbar-bell-container'>
               <img className='navbar-bell' onClick={toggleNotifications} src={bell} alt='notifications'></img>
@@ -639,6 +743,11 @@ function Main() {
             <div>Or another</div>
           </div> */}
         </div>
+
+        {display.profile && <Profile
+        toggleProfile={toggleProfile}
+        setProf={setProf}
+        ></Profile>}
 
         {display.settings && <Settings 
         toggleSettings={toggleSettings}

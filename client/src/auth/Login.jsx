@@ -32,15 +32,15 @@ function Login() {
 
   const handleInput = (e) => {
     setFormValue({...formValue, [e.target.name]: e.target.value});
-    console.log({...formValue, [e.target.name]: e.target.value});
+    //console.log({...formValue, [e.target.name]: e.target.value});
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Submit:'+ {formValue});
+    //console.log('Submit:'+ {formValue});
     try {
       const res = await axios.post('/routes/login', formValue);
-        console.log(res.data);
+        //console.log(res.data);
         
         navigate('../main');
     } catch (err) {
