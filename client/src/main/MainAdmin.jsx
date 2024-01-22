@@ -618,6 +618,28 @@ function Main() {
           locked: res.data.redlasergun.locked,
         },
       });
+      setShipState({...shipState,
+        dps: {
+          level: res.data.ship_dps.level,
+          cost: res.data.ship_dps.cost,
+          multiplier: res.data.ship_dps.multiplier,
+        },
+        damageDealt: {
+          level: res.data.ship_damage.level,
+          cost: res.data.ship_damage.cost,
+          multiplier: res.data.ship_damage.multiplier,
+        },
+        critChance: {
+          level: res.data.ship_crit.level,
+          cost: res.data.ship_crit.cost,
+          multiplier: res.data.ship_crit.multiplier,
+        },
+        gold: {
+          level: res.data.ship_gold.level,
+          cost: res.data.ship_gold.cost,
+          multiplier: res.data.ship_gold.multiplier,
+        },
+      });
 
       const newSocket = io(`http://localhost:8000`);
       setSocket(newSocket);
@@ -685,7 +707,7 @@ function Main() {
     }
   }
   const options = [<Store itemState={itemState} buyItem={buyItem}/>, 
-  <Ship/>, 
+  <Ship shipState={shipState} buyShip={buyShip}/>, 
   <Stats playerState={playerState} planetState={planetState}/>, 
   <AdminPanel 
   playerState={playerState} setPlayerState={setPlayerState}
