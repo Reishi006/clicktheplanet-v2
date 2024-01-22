@@ -165,11 +165,19 @@ const dpsPlanet = () => {
             reset = false;
         }
     }
+    
 }
 
-setInterval(() => {
-    dpsPlanet();
-}, 1000);
+let interval;
+
+const intervalFunc = () => {
+    interval = setInterval(() => {
+        dpsPlanet();
+    }, 1000);
+}
+
+intervalFunc();
+
 
 const hitPlanet = () => {
     calculateCritChance();
@@ -255,6 +263,8 @@ const buyItem = (name, id) => {
         gameState['items'][name]['damage'] = Math.floor(gameState['items'][name]['damage'] + (gameState['items'][name]['baseDamage'] * 1.05**gameState['items'][name]['level']));
         calculateCurrentDamage();
         console.log(gameState['items'][name]);
+        clearInterval(interval);
+        intervalFunc();
 
         db.query(itemQuery, 
         [
