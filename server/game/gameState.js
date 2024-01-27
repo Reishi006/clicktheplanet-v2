@@ -41,6 +41,12 @@ WHERE u.id = ? AND us.ship_id = ?`;
 let diamondsQuery = `UPDATE game JOIN users ON game.user_id = users.id SET diamonds = ? WHERE users.id = ?`;
 
 const calculatePlanet = () => {
+
+    clearInterval(interval);
+    interval = setInterval(() => {
+        dpsPlanet();
+    }, 1000);
+
     if (planet.currentLevel == 1) {
         planet.maxHp = 10;
         planet.currentHp = planet.maxHp;
@@ -165,19 +171,11 @@ const dpsPlanet = () => {
             reset = false;
         }
     }
-    
 }
 
-let interval;
-
-const intervalFunc = () => {
-    interval = setInterval(() => {
-        dpsPlanet();
-    }, 1000);
-}
-
-intervalFunc();
-
+let interval = setInterval(() => {
+    dpsPlanet();
+}, 1000);
 
 const hitPlanet = () => {
     calculateCritChance();
@@ -263,8 +261,6 @@ const buyItem = (name, id) => {
         gameState['items'][name]['damage'] = Math.floor(gameState['items'][name]['damage'] + (gameState['items'][name]['baseDamage'] * 1.05**gameState['items'][name]['level']));
         calculateCurrentDamage();
         console.log(gameState['items'][name]);
-        clearInterval(interval);
-        intervalFunc();
 
         db.query(itemQuery, 
         [
