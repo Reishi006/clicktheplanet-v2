@@ -381,7 +381,15 @@ function Main() {
   }
 
   useEffect(() => {
+    const interval = setInterval(() => {
+      if (shipState.dps.level >= 1) {
+        handleDps();
+        console.log('DPS interval');
+      }
+    }, 1000);
     generatePlanetName();
+    console.log(`${planetState.currentStage} ${planetState.currentLevel}`);
+    return () => clearInterval(interval);
   }, [planetState.currentStage, planetState.currentLevel]);
 
   const handleDps = () => {
@@ -396,6 +404,8 @@ function Main() {
           currentStage: data.gameState.planet.currentStage,
           maxStage: data.gameState.planet.maxStage,
         });
+
+        console.log(planetState.currentLevel);
 
         setPlayerState(playerState => ({...playerState,
           gold: data.gameState.player.gold,
@@ -415,6 +425,7 @@ function Main() {
     }, 1000);
     return () => clearInterval(interval);
   }, [socket, shipState.dps.level]);
+
 
   const handlePlanet = () => {
       socket.emit('sendclick', 'User clicked');
