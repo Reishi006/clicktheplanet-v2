@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 21, 2024 at 10:38 PM
+-- Generation Time: Jan 28, 2024 at 12:58 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -50,12 +50,13 @@ CREATE TABLE `game` (
 
 INSERT INTO `game` (`id`, `user_id`, `gold`, `diamonds`, `currentlevel`, `maxlevel`, `currentstage`, `maxstage`, `currenthp`, `maxhp`, `currentdamage`, `totaldamage`, `critchance`, `guild_id`) VALUES
 (10, 10, '123132', '1', '3', '1232', 0, 0, '27', '27', '23', '0', '0.03', NULL),
-(41, 38, '1725307', '110', '7', '7', 1, 1, '147', '147', '59', '2953', '0.01', NULL),
+(41, 38, '59741692407', '131', '123', '123', 0, 0, '45387', '45387', '4033', '22574424', '0.01', NULL),
 (42, 39, '5019329', '110', '38', '38', 10, 10, '4332', '4332', '3335', '1196143', '0.01', NULL),
 (43, 40, '1854402', '107', '34', '34', 8, 8, '3468', '3468', '1206', '725343.8300000002', '0.01', NULL),
 (44, 41, '5673', '102', '3', '3', 9, 9, '27', '27', '9', '554', '0.01', NULL),
 (45, 42, '68410', '113', '19', '19', 10, 10, '1083', '1083', '340', '95582', '0.01', NULL),
-(46, 43, '100', '100', '1', '1', 0, 0, '10', '10', '1', '0', '0.01', NULL);
+(46, 43, '100', '100', '1', '1', 0, 0, '10', '10', '1', '0', '0.01', NULL),
+(47, 44, '100', '100', '1', '1', 0, 0, '10', '10', '1', '0', '0.01', NULL);
 
 -- --------------------------------------------------------
 
@@ -261,7 +262,8 @@ INSERT INTO `users` (`id`, `email`, `login`, `password`, `admin`, `redeemed`) VA
 (40, 'asd@mail.com', 'Asd', '$2a$10$AGbG521Shjbrnucrzy7hoO.1VG9iJJTLCcEqYN84ZbJcC8JLw.7LG', 0, 0),
 (41, 'email@email.com', 'Email', '$2a$10$AM2slCmbSznH4b6CKjc8lOy/0CEtRH0ZilhSoFcex5AJYVTZWvANi', 0, 0),
 (42, 'mail@mail.com', 'Mail', '$2a$10$aRRr77WrA0xAPovhpDSH4O04qVwskTP1tRAcfT76v9LcPOY3S8phW', 0, 0),
-(43, 'gmail@gmail.com', 'Gmail', '$2a$10$Ic78L9BuplP0oapRcjYo0uRbA/bc72RcHRa332YaXtefBqBppaD9e', 0, 0);
+(43, 'gmail@gmail.com', 'Gmail', '$2a$10$Ic78L9BuplP0oapRcjYo0uRbA/bc72RcHRa332YaXtefBqBppaD9e', 0, 0),
+(44, 'jan.kowalski@example.com', 'JanKowalski', '$2a$10$vs69WIZga7HX5PeFVs1mS.lXSTuywH0daEh94LcO4TiwRPrLx0fbO', 0, 0);
 
 -- --------------------------------------------------------
 
@@ -287,9 +289,9 @@ INSERT INTO `users_items` (`id`, `user_id`, `item_id`, `level`, `cost`, `damage`
 (17, 10, 1, '6', '134', '6', 0),
 (18, 10, 2, '0', '1000', '10', 1),
 (19, 10, 3, '0', '2500', '100', 1),
-(35, 38, 1, '27', '373', '43', 0),
-(36, 38, 2, '0', '1000', '0', 1),
-(37, 38, 3, '0', '2500', '0', 1),
+(35, 38, 1, '75', '3883', '174', 0),
+(36, 38, 2, '28', '3920', '599', 1),
+(37, 38, 3, '15', '51973', '2258', 1),
 (38, 39, 1, '45', '898', '109', 0),
 (39, 39, 2, '6', '1340', '69', 1),
 (40, 39, 3, '11', '42758', '1487', 1),
@@ -304,7 +306,10 @@ INSERT INTO `users_items` (`id`, `user_id`, `item_id`, `level`, `cost`, `damage`
 (49, 42, 3, '0', '2500', '0', 1),
 (50, 43, 1, '0', '100', '0', 0),
 (51, 43, 2, '0', '1000', '0', 1),
-(52, 43, 3, '0', '2500', '0', 1);
+(52, 43, 3, '0', '2500', '0', 1),
+(53, 44, 1, '0', '100', '0', 0),
+(54, 44, 2, '0', '1000', '0', 1),
+(55, 44, 3, '0', '2500', '0', 1);
 
 -- --------------------------------------------------------
 
@@ -332,7 +337,7 @@ INSERT INTO `users_ship` (`id`, `user_id`, `ship_id`, `level`, `cost`, `multipli
 (6, 10, 4, '0', '50000', '1.00'),
 (23, 38, 1, '175', '5106547', '1.76'),
 (24, 38, 2, '33', '50031', '1.33'),
-(25, 38, 3, '13', '94282', '1.13'),
+(25, 38, 3, '19', '252695', '2.9'),
 (26, 38, 4, '11', '85516', '1.11'),
 (27, 39, 1, '57', '16135', '1.15'),
 (28, 39, 2, '114', '2603634', '2.14'),
@@ -353,7 +358,11 @@ INSERT INTO `users_ship` (`id`, `user_id`, `ship_id`, `level`, `cost`, `multipli
 (43, 43, 1, '0', '1000', '0.01'),
 (44, 43, 2, '0', '10000', '1.00'),
 (45, 43, 3, '0', '50000', '1.00'),
-(46, 43, 4, '0', '50000', '1.00');
+(46, 43, 4, '0', '50000', '1.00'),
+(47, 44, 1, '0', '1000', '0.01'),
+(48, 44, 2, '0', '10000', '1.00'),
+(49, 44, 3, '0', '50000', '1.00'),
+(50, 44, 4, '0', '50000', '1.00');
 
 --
 -- Indexes for dumped tables
@@ -434,7 +443,7 @@ ALTER TABLE `users_ship`
 -- AUTO_INCREMENT for table `game`
 --
 ALTER TABLE `game`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
 
 --
 -- AUTO_INCREMENT for table `guilds`
@@ -476,19 +485,19 @@ ALTER TABLE `ship`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
 
 --
 -- AUTO_INCREMENT for table `users_items`
 --
 ALTER TABLE `users_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
 
 --
 -- AUTO_INCREMENT for table `users_ship`
 --
 ALTER TABLE `users_ship`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
 -- Constraints for dumped tables
